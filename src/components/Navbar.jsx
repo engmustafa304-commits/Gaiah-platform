@@ -1,31 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { useLanguage } from '../context/LanguageContext';
-import { translations } from '../locales/translations';
+import React, { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
 
 const Navbar = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { language, toggleLanguage } = useLanguage();
-  const t = translations[language];
+  const [isScrolled, setIsScrolled] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    const handleScroll = () => setIsScrolled(window.scrollY > 50)
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   const navLinks = [
-    { name: t.nav.home, href: '#' },
-    { name: t.nav.services, href: '#services' },
-    { name: t.nav.freeTrial, href: '#free-trial' },
-    { name: t.nav.designs, href: '#designs' },
-    { name: t.nav.pricing, href: '#pricing' },
-    { name: t.nav.values, href: '#values' },
-    { name: t.nav.contact, href: '#contact' },
-  ];
+    { name: 'الرئيسية', href: '#' },
+    { name: 'الخدمات', href: '#services' },
+    { name: 'تجربة مجانية', href: '#free-trial' },
+    { name: 'التصاميم', href: '#designs' },
+    { name: 'الباقات', href: '#pricing' },
+    { name: 'قيمنا', href: '#values' },
+    { name: 'تواصل', href: '#contact' },
+  ]
 
   return (
     <motion.nav
@@ -36,15 +30,13 @@ const Navbar = () => {
         isScrolled ? 'bg-white/95 backdrop-blur-md shadow-lg' : 'bg-transparent'
       }`}
     >
-      <div className="container-custom">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
           <motion.div whileHover={{ scale: 1.05 }} className="flex items-center">
-            <a href="#" className="flex items-center">
-              <img src="/assets/images/logo/logo.png" alt="Gaiah Logo" className="h-12 w-auto" />
-            </a>
+            <a href="#" className="text-2xl font-bold text-primary">جيّة</a>
           </motion.div>
 
-          <div className="hidden md:flex items-center space-x-8 space-x-reverse">
+          <div className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
               <motion.a
                 key={link.name}
@@ -55,21 +47,12 @@ const Navbar = () => {
                 {link.name}
               </motion.a>
             ))}
-            
-            {/* Language Toggle Button */}
-            <button
-              onClick={toggleLanguage}
-              className="text-primary border border-primary/30 px-3 py-1 rounded-full text-sm hover:bg-primary hover:text-white transition-all duration-300"
-            >
-              {language === 'ar' ? 'EN' : 'عربي'}
-            </button>
-            
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="bg-primary text-white px-6 py-2 rounded-full hover:bg-primary-dark transition-all duration-300"
             >
-              {t.nav.startNow}
+              ابدأ الآن
             </motion.button>
           </div>
 
@@ -91,7 +74,6 @@ const Navbar = () => {
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
             className="md:hidden py-4 bg-white rounded-xl shadow-lg mt-2"
           >
             {navLinks.map((link) => (
@@ -104,20 +86,14 @@ const Navbar = () => {
                 {link.name}
               </a>
             ))}
-            <button
-              onClick={toggleLanguage}
-              className="block w-full text-right py-2 px-4 text-primary hover:text-primary-light hover:bg-gray-50 transition-colors border-t border-gray-100 mt-2"
-            >
-              {language === 'ar' ? 'English' : 'العربية'}
-            </button>
-            <button className="w-full mt-2 bg-primary text-white px-6 py-2 rounded-full hover:bg-primary-dark transition-all">
-              {t.nav.startNow}
+            <button className="w-full mt-4 bg-primary text-white px-6 py-2 rounded-full hover:bg-primary-dark transition-all">
+              ابدأ الآن
             </button>
           </motion.div>
         )}
       </div>
     </motion.nav>
-  );
-};
+  )
+}
 
-export default Navbar;
+export default Navbar
