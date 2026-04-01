@@ -1,208 +1,156 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { useInView } from 'react-intersection-observer';
+import React from 'react'
 
 const Pricing = () => {
-  const [ref, inView] = useInView({
-    triggerOnce: true,
-    threshold: 0.2,
-  });
-
   const plans = [
     {
       name: "الباقة الأساسية",
       price: "350",
-      priceSub: "يبدأ من 50 ضيف",
-      description: "حلول أساسية لمناسبتك - تدير كل شيء بنفسك",
-      color: "from-primary to-primary-dark",
-      badge: null,
-      features: [
-        "دعوة تجريبية قبل المناسبة",
-        "اختيار تصميم جاهز (40 تصميم)",
-        "إرسال الدعوات عبر الواتساب",
-        "تأكيد حضور فوري",
-        "متابعة الضيوف في الوقت الفعلي",
-        "رسالة تذكيرية قبل المناسبة",
-        "إحصائية قائمة المدعوين",
-        "دعوة تعويضية من إجمالي 25%",
-        "3 أيام عمل من استلام التفاصيل"
-      ],
-      buttonText: "ابدأ الآن",
-      buttonColor: "bg-primary hover:bg-primary-dark"
+      period: "يبدأ من 50 ضيف",
+      icon: "🎯",
+      features: ["دعوة تجريبية", "اختيار تصميم جاهز (40 تصميم)", "إرسال الدعوات عبر واتساب", "تأكيد حضور فوري", "متابعة الضيوف في الوقت الفعلي", "إحصائية قائمة المدعوين"],
+      priceList: [{ guests: 50, price: 350 }, { guests: 100, price: 700 }, { guests: 150, price: 1050 }, { guests: 200, price: 1400 }, { guests: 300, price: 2100 }, { guests: 400, price: 2800 }, { guests: 500, price: 3500 }]
+    },
+    {
+      name: "الباقة المتوسطة",
+      price: "800",
+      period: "يبدأ من 100 ضيف",
+      icon: "📈",
+      features: ["دعوة تجريبية", "تصميم حسب الطلب", "إرسال الدعوات عبر واتساب", "تأكيد حضور فوري", "متابعة الضيوف", "إحصائية قائمة المدعوين"],
+      priceList: [{ guests: 100, price: 800 }, { guests: 150, price: 1200 }, { guests: 200, price: 1600 }, { guests: 300, price: 2400 }, { guests: 400, price: 3200 }, { guests: 500, price: 4000 }]
     },
     {
       name: "الباقة الشاملة",
       price: "400",
-      priceSub: "يبدأ من 50 ضيف",
-      description: "خدمة متكاملة - تتولى كل شيء نيابة عنكم",
-      color: "from-primary-dark to-primary-medium",
-      badge: "الأكثر طلباً",
-      features: [
-        "دعوة تجريبية قبل المناسبة",
-        "تصميم حسب ثيم المناسبة",
-        "إرسال الدعوات عبر الواتساب",
-        "تأكيد حضور فوري",
-        "متابعة الضيوف في الوقت الفعلي",
-        "رسالة تذكيرية قبل المناسبة (يوم ويومين)",
-        "إحصائية قائمة المدعوين",
-        "خاصية الاتصال على المدعوين (3 على الأكثر)",
-        "إعداد ملف الأسماء من قبل (جيّة)",
-        "قروب الدعم الفني المخصص",
-        "8 أيام عمل من استلام التفاصيل"
-      ],
-      buttonText: "اطلب الباقة",
-      buttonColor: "bg-primary hover:bg-primary-dark"
+      period: "يبدأ من 50 ضيف",
+      icon: "⭐",
+      popular: true,
+      features: ["دعوة تجريبية", "تصميم حسب ثيم المناسبة", "إرسال الدعوات عبر واتساب", "تأكيد حضور فوري", "متابعة الضيوف", "رسالة تذكيرية", "إحصائية", "خاصية الاتصال على المدعوين", "إعداد ملف الأسماء"],
+      priceList: [{ guests: 50, price: 400 }, { guests: 100, price: 800 }, { guests: 150, price: 1200 }, { guests: 200, price: 1600 }, { guests: 300, price: 2400 }, { guests: 400, price: 3200 }, { guests: 500, price: 4000 }]
     },
     {
-      name: "خدمة المشرفين",
-      price: "460",
-      priceSub: "يبدأ من مشرف واحد",
-      description: "خدمات احترافية لإدارة المناسبة",
-      color: "from-primary-medium to-primary-light",
-      badge: "خدمة إضافية",
-      features: [
-        "تنظيم الدخول",
-        "مسح الباركود",
-        "زي موحد للفريق",
-        "مدة العمل 6 ساعات",
-        "مشرف واحد: 460 ر.س",
-        "مشرفين: 920 ر.س",
-        "3 مشرفين: 1380 ر.س"
-      ],
-      buttonText: "أضف الخدمة",
-      buttonColor: "bg-primary-medium hover:bg-primary"
-    }
-  ];
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-      },
+      name: "باقة VIP",
+      price: "2400",
+      period: "يبدأ من 300 ضيف",
+      icon: "👑",
+      features: ["كل ميزات الباقة الشاملة", "مدير حساب مخصص", "دعم فني 24/7", "تقرير مفصل", "هدايا ترحيبية", "فريق مشرفين متكامل"],
+      priceList: [{ guests: 300, price: 2400 }, { guests: 400, price: 3200 }, { guests: 500, price: 4000 }]
     },
-  };
-
-  const cardVariants = {
-    hidden: { opacity: 0, y: 50 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
-  };
+    {
+      name: "باقة الشركات",
+      price: "مخصص",
+      period: "حسب الطلب",
+      icon: "🏢",
+      features: ["حلول مخصصة للشركات", "هوية تجارية خاصة", "تقارير تحليلية متقدمة", "فريق دعم مخصص", "تكامل مع أنظمتك"],
+      priceList: [],
+      custom: true
+    }
+  ]
 
   return (
-    <section className="section-padding bg-gradient-to-br from-gray-50 to-white" id="pricing">
-      <div className="container-custom">
-        <motion.div
-          ref={ref}
-          initial="hidden"
-          animate={inView ? "visible" : "hidden"}
-          variants={containerVariants}
-          className="text-center"
-        >
-          <motion.div variants={cardVariants} className="inline-block mb-4">
-            <span className="bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-semibold">
-              باقات مرنة تناسب مناسبتك
-            </span>
-          </motion.div>
-          
-          <motion.h2
-            variants={cardVariants}
-            className="text-3xl md:text-4xl font-bold mb-4 text-primary"
-          >
-            باقات الأسعار
-          </motion.h2>
-          
-          <motion.p
-            variants={cardVariants}
-            className="text-primary-light mb-12 max-w-2xl mx-auto"
-          >
-            اختر الباقة المناسبة لمناسبتك واستمتع بتجربة فاخرة
-          </motion.p>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {plans.map((plan, index) => (
-              <motion.div
-                key={index}
-                variants={cardVariants}
-                whileHover={{ y: -10, scale: 1.02 }}
-                className="relative bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 flex flex-col"
-              >
-                {/* Badge */}
-                {plan.badge && (
-                  <div className="absolute top-4 right-4 z-10">
-                    <span className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-primary text-xs font-bold px-3 py-1 rounded-full shadow-lg">
-                      🔥 {plan.badge}
-                    </span>
-                  </div>
-                )}
-                
-                {/* Header */}
-                <div className={`bg-gradient-to-r ${plan.color} p-6 text-white text-center`}>
-                  <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
-                  <div className="text-4xl font-bold mb-1">{plan.price} <span className="text-lg">ر.س</span></div>
-                  <p className="text-white/80 text-sm">{plan.priceSub}</p>
-                </div>
-                
-                {/* Description */}
-                <div className="px-6 pt-6">
-                  <p className="text-primary-light text-sm text-center border-b border-gray-100 pb-4">
-                    {plan.description}
-                  </p>
-                </div>
-                
-                {/* Features */}
-                <div className="flex-1 p-6">
-                  <ul className="space-y-3">
-                    {plan.features.map((feature, idx) => (
-                      <motion.li
-                        key={idx}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: idx * 0.03 }}
-                        className="flex items-center gap-2 text-sm"
-                      >
-                        <span className="text-primary text-lg">✓</span>
-                        <span className="text-primary-light">{feature}</span>
-                      </motion.li>
-                    ))}
-                  </ul>
-                </div>
-                
-                {/* Footer */}
-                <div className="p-6 pt-0">
-                  <button className={`w-full ${plan.buttonColor} text-white py-3 rounded-full font-semibold transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105`}>
-                    {plan.buttonText}
-                  </button>
-                  {index === 0 && (
-                    <p className="text-xs text-primary-light text-center mt-3">
-                      * السعر غير شامل مشرف الباركود
-                    </p>
-                  )}
-                  {index === 1 && (
-                    <p className="text-xs text-primary-light text-center mt-3">
-                      * 8 أيام عمل من استلام التفاصيل
-                    </p>
-                  )}
-                  {index === 2 && (
-                    <p className="text-xs text-primary-light text-center mt-3">
-                      * الأسعار غير شاملة ضريبة القيمة المضافة
-                    </p>
-                  )}
-                </div>
-              </motion.div>
-            ))}
+    <section className="py-16 sm:py-20 bg-gray-50" id="pricing">
+      <div className="container mx-auto px-4">
+        <div className="text-center mb-12">
+          <div className="inline-block bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-semibold mb-4">
+            باقات مرنة
           </div>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">
+            باقات <span className="text-[#004242]">الأسعار</span>
+          </h2>
+          <p className="text-primary-light text-sm sm:text-base">اختر الباقة المناسبة لعدد مدعوينك واستمتع بتجربة فاخرة</p>
+        </div>
 
-          {/* ملاحظة إضافية */}
-          <motion.div variants={cardVariants} className="mt-12 text-center">
-            <p className="text-sm text-primary-light">
-              <span className="font-semibold text-primary">للشركات والفعاليات الكبرى:</span> باقات مخصصة حسب الطلب - تواصل معنا للحصول على عرض خاص
-            </p>
-          </motion.div>
-        </motion.div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5 sm:gap-6">
+          {plans.map((plan, idx) => (
+            <div key={idx} className={`relative bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all ${plan.popular ? 'ring-2 ring-[#004242] transform scale-105 z-10' : ''}`}>
+              {plan.popular && (
+                <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-[#3a7a7a] to-[#004242] text-white text-center py-1.5 text-xs font-bold">
+                  🔥 الأكثر طلباً
+                </div>
+              )}
+              <div className={`p-5 ${plan.popular ? 'pt-8' : ''}`}>
+                <div className="bg-gradient-to-br from-primary to-primary-dark rounded-xl p-4 text-white text-center">
+                  <div className="text-3xl mb-2">{plan.icon}</div>
+                  <h3 className="text-lg font-bold">{plan.name}</h3>
+                  {!plan.custom ? (
+                    <>
+                      <div className="text-2xl font-bold mt-2">{plan.price} <span className="text-sm">ر.س</span></div>
+                      <p className="text-gray-300 text-xs">{plan.period}</p>
+                    </>
+                  ) : (
+                    <>
+                      <div className="text-xl font-bold mt-2">{plan.price}</div>
+                      <p className="text-gray-300 text-xs">{plan.period}</p>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {plan.priceList.length > 0 && (
+                <div className="px-5 mb-3">
+                  <div className="bg-gray-50 rounded-lg p-3">
+                    <h4 className="font-bold text-primary mb-2 text-center text-xs">أسعار تفصيلية</h4>
+                    <div className="space-y-1">
+                      {plan.priceList.slice(0, 3).map((item, i) => (
+                        <div key={i} className="flex justify-between text-[10px] border-b border-gray-200 pb-1">
+                          <span className="text-primary-light">{item.guests} مدعو</span>
+                          <span className="text-primary font-bold">{item.price} ر.س</span>
+                        </div>
+                      ))}
+                      {plan.priceList.length > 3 && (
+                        <details className="text-center text-[10px] text-primary-light">
+                          <summary className="cursor-pointer">عرض المزيد +</summary>
+                          <div className="mt-1 space-y-1">
+                            {plan.priceList.slice(3).map((item, i) => (
+                              <div key={i} className="flex justify-between text-[10px] border-b border-gray-200 pb-1">
+                                <span className="text-primary-light">{item.guests} مدعو</span>
+                                <span className="text-primary font-bold">{item.price} ر.س</span>
+                              </div>
+                            ))}
+                          </div>
+                        </details>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="px-5 mb-4">
+                <h4 className="font-bold text-primary mb-2 text-center text-xs">مميزات الباقة</h4>
+                <ul className="space-y-1">
+                  {plan.features.slice(0, 4).map((feature, i) => (
+                    <li key={i} className="flex items-center gap-1.5 text-[10px]">
+                      <span className="text-green-500 text-xs">✓</span>
+                      <span className="text-primary-light">{feature}</span>
+                    </li>
+                  ))}
+                  {plan.features.length > 4 && (
+                    <details className="text-center text-[10px] text-primary-light">
+                      <summary className="cursor-pointer">عرض المزيد +</summary>
+                      <div className="mt-1 space-y-1">
+                        {plan.features.slice(4).map((feature, i) => (
+                          <li key={i} className="flex items-center gap-1.5 text-[10px]">
+                            <span className="text-green-500 text-xs">✓</span>
+                            <span className="text-primary-light">{feature}</span>
+                          </li>
+                        ))}
+                      </div>
+                    </details>
+                  )}
+                </ul>
+              </div>
+
+              <div className="p-5 pt-0">
+                <button className="w-full bg-gradient-to-r from-[#3a7a7a] to-[#004242] text-white py-2 rounded-lg font-semibold text-xs hover:opacity-90 transition">
+                  {plan.custom ? "اطلب عرضاً" : "اختر الباقة"}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+        <p className="text-xs text-primary-light text-center mt-8"><span className="font-semibold text-primary">ملاحظة:</span> الأسعار غير شاملة ضريبة القيمة المضافة</p>
       </div>
     </section>
-  );
-};
+  )
+}
 
-export default Pricing;
+export default Pricing

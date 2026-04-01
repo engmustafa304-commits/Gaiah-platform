@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -12,87 +11,59 @@ const Navbar = () => {
   }, [])
 
   const navLinks = [
-    { name: 'الرئيسية', href: '#' },
+    { name: 'الرئيسية', href: '/' },
     { name: 'الخدمات', href: '#services' },
     { name: 'تجربة مجانية', href: '#free-trial' },
     { name: 'التصاميم', href: '#designs' },
     { name: 'الباقات', href: '#pricing' },
     { name: 'قيمنا', href: '#values' },
-    { name: 'تواصل', href: '#contact' },
   ]
 
   return (
-    <motion.nav
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.6 }}
-      className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-white/95 backdrop-blur-md shadow-lg' : 'bg-transparent'
-      }`}
-    >
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center py-4">
-          <motion.div whileHover={{ scale: 1.05 }} className="flex items-center">
-            <a href="#" className="text-2xl font-bold text-primary">جيّة</a>
-          </motion.div>
+    <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+      isScrolled ? 'bg-white/95 backdrop-blur-md shadow-lg py-3' : 'bg-transparent py-5'
+    }`}>
+      <div className="container mx-auto px-4">
+        <div className="flex justify-between items-center">
+          <a href="/" className="flex items-center">
+            <img 
+              src="/images/logo/logo.png" 
+              alt="Gaiah Logo" 
+              className="h-10 w-auto"
+              onError={(e) => { e.target.style.display = 'none' }}
+            />
+          </a>
 
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-6 lg:gap-8">
             {navLinks.map((link) => (
-              <motion.a
-                key={link.name}
-                href={link.href}
-                whileHover={{ scale: 1.05 }}
-                className="text-primary hover:text-primary-light transition-colors duration-300 font-medium"
-              >
+              <a key={link.name} href={link.href} className="text-primary hover:text-[#004242] transition-colors duration-300 text-sm lg:text-base">
                 {link.name}
-              </motion.a>
+              </a>
             ))}
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="bg-primary text-white px-6 py-2 rounded-full hover:bg-primary-dark transition-all duration-300"
-            >
+            <button className="bg-primary text-white px-5 lg:px-6 py-2 rounded-full hover:bg-primary-dark transition-all text-sm lg:text-base">
               ابدأ الآن
-            </motion.button>
+            </button>
           </div>
 
-          <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden text-primary focus:outline-none"
-          >
+          <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="md:hidden text-primary">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              {isMobileMenuOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              )}
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={isMobileMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
             </svg>
           </button>
         </div>
 
         {isMobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="md:hidden py-4 bg-white rounded-xl shadow-lg mt-2"
-          >
+          <div className="md:hidden mt-4 py-4 bg-white rounded-xl shadow-lg">
             {navLinks.map((link) => (
-              <a
-                key={link.name}
-                href={link.href}
-                className="block py-2 px-4 text-primary hover:text-primary-light hover:bg-gray-50 transition-colors"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
+              <a key={link.name} href={link.href} className="block py-2 px-4 text-primary hover:bg-gray-50 transition-colors">
                 {link.name}
               </a>
             ))}
-            <button className="w-full mt-4 bg-primary text-white px-6 py-2 rounded-full hover:bg-primary-dark transition-all">
-              ابدأ الآن
-            </button>
-          </motion.div>
+            <button className="w-full mt-2 bg-primary text-white px-6 py-2 rounded-full">ابدأ الآن</button>
+          </div>
         )}
       </div>
-    </motion.nav>
+    </nav>
   )
 }
 

@@ -1,94 +1,33 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { useInView } from 'react-intersection-observer';
+import React from 'react'
 
 const Services = () => {
-  const [ref, inView] = useInView({
-    triggerOnce: true,
-    threshold: 0.2,
-  });
-
   const services = [
-    {
-      icon: "🎨",
-      title: "تصميم دعوات إلكترونية",
-      description: "تصاميم فاخرة تناسب مناسبتك",
-    },
-    {
-      icon: "💬",
-      title: "إرسال الدعوات عبر واتساب",
-      description: "وصول سريع ومباشر للضيوف",
-    },
-    {
-      icon: "✅",
-      title: "تأكيد الحضور",
-      description: "نظام متكامل لتأكيد الحضور",
-    },
-    {
-      icon: "📊",
-      title: "إحصائيات المدعوين",
-      description: "تقارير دقيقة ومتابعة لحضور الضيوف",
-    }
-  ];
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
-  };
-
-  const cardVariants = {
-    hidden: { opacity: 0, y: 50 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
-  };
+    { icon: "🎨", title: "تصميم دعوات إلكترونية", desc: "تصاميم فاخرة تناسب مناسبتك", color: "#3a7a7a" },
+    { icon: "💬", title: "إرسال الدعوات عبر واتساب", desc: "وصول سريع ومباشر للضيوف", color: "#1e5e5e" },
+    { icon: "✅", title: "تأكيد الحضور", desc: "نظام متكامل لتأكيد الحضور", color: "#004242" },
+    { icon: "📊", title: "إحصائيات المدعوين", desc: "تقارير دقيقة ومتابعة لحضور الضيوف", color: "#6a9a9a" }
+  ]
 
   return (
-    <section className="section-padding bg-gray-100" id="services">
-      <div className="container-custom">
-        <motion.div
-          ref={ref}
-          initial="hidden"
-          animate={inView ? "visible" : "hidden"}
-          variants={containerVariants}
-        >
-          <motion.h2
-            variants={cardVariants}
-            className="text-3xl md:text-4xl font-bold text-center mb-4 text-primary"
-          >
-            خدماتنا
-          </motion.h2>
-          
-          <motion.p
-            variants={cardVariants}
-            className="text-center text-primary-light mb-12 max-w-2xl mx-auto"
-          >
-            نقدم لك مجموعة متكاملة من الخدمات لتجعل مناسبتك لا تُنسى
-          </motion.p>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {services.map((service, index) => (
-              <motion.div
-                key={index}
-                variants={cardVariants}
-                whileHover={{ y: -10, scale: 1.05 }}
-                className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 text-center group"
-              >
-                <div className="text-5xl mb-4 inline-block p-4 rounded-full bg-gray-100">
-                  {service.icon}
-                </div>
-                <h3 className="text-xl font-bold mb-2 text-primary">{service.title}</h3>
-                <p className="text-primary-light">{service.description}</p>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
+    <section className="py-20 bg-white" id="services">
+      <div className="container mx-auto px-4 text-center">
+        <div className="inline-block bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-semibold mb-4">
+          خدماتنا
+        </div>
+        <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">ماذا نقدم لك؟</h2>
+        <p className="text-primary-light mb-12">نقدم لك مجموعة متكاملة من الخدمات</p>
+        <div className="grid md:grid-cols-4 gap-6">
+          {services.map((s, i) => (
+            <div key={i} className="bg-gray-50 p-6 rounded-xl shadow-md hover:shadow-xl transition-all text-center group">
+              <div className="text-5xl mb-3 group-hover:scale-110 transition-transform" style={{ color: s.color }}>{s.icon}</div>
+              <h3 className="text-lg font-bold text-primary mb-2">{s.title}</h3>
+              <p className="text-primary-light text-sm">{s.desc}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
-  );
-};
+  )
+}
 
-export default Services;
+export default Services

@@ -1,87 +1,46 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { useInView } from 'react-intersection-observer';
-import { useLanguage } from '../context/LanguageContext';
-import { translations } from '../locales/translations';
+import React from 'react'
 
 const Hero = () => {
-  const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 });
-  const { language } = useLanguage();
-  const t = translations[language];
-
-  // اتجاه الحركة يعتمد على اللغة
-  const isRTL = language === 'ar';
-  
-  const fadeInDirection = {
-    hidden: { opacity: 0, x: isRTL ? 80 : -80 },
-    visible: { opacity: 1, x: 0, transition: { duration: 0.8, ease: "easeOut" } },
-  };
-
   return (
-    <section className="relative h-screen overflow-hidden">
+    <section className="relative min-h-screen overflow-hidden">
+
+      {/* الخلفية */}
       <div className="absolute inset-0 z-0">
         <img 
           src="/images/hero-bg.jpg" 
-          alt="Hero Background" 
-          className="w-full h-full object-cover brightness-100 contrast-100"
+          alt="Hero Background"
+          className="w-full h-full object-cover brightness-110 contrast-110"
+          style={{ 
+            objectPosition: 'center 35%',
+          }}
           onError={(e) => {
-            e.target.onerror = null;
-            e.target.src = 'https://images.unsplash.com/photo-1519741497674-611481863552?ixlib=rb-4.0.3';
+            e.target.src = 'https://images.unsplash.com/photo-1519741497674-611481863552'
           }}
         />
-        {/* تدرج حسب اتجاه اللغة */}
-        <div className={`absolute inset-0 ${
-          isRTL 
-            ? 'bg-gradient-to-r from-black/40 via-black/20 to-transparent'
-            : 'bg-gradient-to-l from-black/40 via-black/20 to-transparent'
-        }`}></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
+
+        {/* Gradient احترافي من اليمين */}
+        <div className="absolute inset-0 bg-gradient-to-l from-black/85 via-black/50 to-transparent"></div>
       </div>
 
-      <div className="relative z-10 h-full flex items-end pb-24">
-        <div className="container-custom">
-          <div className={`flex ${isRTL ? 'justify-start' : 'justify-end'}`}>
-            <motion.div
-              ref={ref}
-              initial="hidden"
-              animate={inView ? "visible" : "hidden"}
-              variants={fadeInDirection}
-              className={`w-full lg:w-1/2 ${isRTL ? 'text-right' : 'text-left'}`}
-            >
-              <motion.h1
-                variants={fadeInDirection}
-                className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight text-white"
-              >
-                {t.hero.title}
-                <span className="block text-primary-light">
-                  {t.hero.subtitle}
-                </span>
-              </motion.h1>
-              
-              <motion.p
-                variants={fadeInDirection}
-                className="text-lg md:text-xl text-gray-200 mb-8"
-              >
-                {t.hero.description}
-              </motion.p>
-
-              <motion.button
-                variants={fadeInDirection}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="bg-primary text-white px-10 py-4 rounded-full text-lg font-semibold hover:bg-primary-dark transition-all duration-300 shadow-xl inline-flex items-center gap-2 group"
-              >
-                {t.hero.cta}
-                <svg className={`w-5 h-5 transition-transform group-hover:${isRTL ? '-translate-x-1' : 'translate-x-1'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={isRTL ? "M9 5l7 7-7 7" : "M19 9l-7 7-7-7"} />
-                </svg>
-              </motion.button>
-            </motion.div>
-          </div>
-        </div>
+      {/* المحتوى - يمين تحت مع تحسين للهاتف */}
+      <div className="absolute bottom-8 sm:bottom-12 right-4 sm:right-10 md:right-16 z-20 max-w-sm sm:max-w-md md:max-w-xl text-white text-right">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-3 sm:mb-4 leading-tight drop-shadow-2xl">
+          حوّل مناسبتك إلى{' '}
+          <span className="block text-[#3a7a7a] mt-2">
+            تجربة رقمية أنيقة
+          </span>
+        </h1>
+        <p className="text-xs sm:text-sm md:text-base lg:text-lg text-gray-200 mb-4 sm:mb-6 leading-relaxed drop-shadow-md">
+          <span className="text-[#6a9a9a] font-semibold">دعوات إلكترونية</span>{' '}
+          بتصميم فاخر وتجربة سلسة لضيوفك
+        </p>
+        <button className="bg-white text-black px-5 sm:px-7 md:px-9 py-2 sm:py-3 rounded-full text-xs sm:text-sm md:text-base font-semibold hover:bg-gray-200 transition-all duration-300 shadow-xl hover:scale-105">
+          ابدأ الآن
+        </button>
       </div>
+
     </section>
-  );
-};
+  )
+}
 
-export default Hero;
+export default Hero
