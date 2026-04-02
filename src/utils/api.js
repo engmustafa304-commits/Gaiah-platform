@@ -1,49 +1,43 @@
-// API Configuration - Mock Version (للتجربة بدون Backend)
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
-
-// Helper function for API calls
-const apiCall = async (endpoint, options = {}) => {
-  const token = localStorage.getItem('token');
-  
-  const headers = {
-    'Content-Type': 'application/json',
-    ...options.headers,
-  };
-  
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-  
-  const config = {
-    ...options,
-    headers,
-  };
-  
-  try {
-    const response = await fetch(`${API_URL}${endpoint}`, config);
-    const data = await response.json();
-    
-    if (!response.ok) {
-      throw new Error(data.error || 'حدث خطأ في الطلب');
-    }
-    
-    return data;
-  } catch (error) {
-    console.error('API Error:', error);
-    throw error;
-  }
+// API Configuration - Mock Version مع تخزين منفصل لكل مناسبة
+const STORAGE_KEYS = {
+  EVENTS: 'gaiah_events',
+  USERS: 'gaiah_users',
+  CURRENT_USER: 'gaiah_current_user'
 };
 
-// Mock API (للتجربة بدون Backend حقيقي)
-const mockUsers = JSON.parse(localStorage.getItem('mock_users') || '[]');
+// Helper functions
+const getCurrentUser = () => {
+  const user = localStorage.getItem(STORAGE_KEYS.CURRENT_USER);
+  return user ? JSON.parse(user) : null;
+};
 
-const mockAPI = {
-  register: (userData) => {
-    return new Promise((resolve, reject) => {
+const getEvents = () => {
+  const events = localStorage.getItem(STORAGE_KEYS.EVENTS);
+  return events ? JSON.parse(events) : [];
+};
+
+const saveEvents = (events) => {
+  localStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(events));
+};
+
+const getGuestsForEvent = (eventId) => {
+  const guests = localStorage.getItem(`gaiah_guests_${eventId}`);
+  return guests ? JSON.parse(guests) : [];
+};
+
+const saveGuestsForEvent = (eventId, guests) => {
+  localStorage.setItem(`gaiah_guests_${eventId}`, JSON.stringify(guests));
+};
+
+// Auth APIs
+export const authAPI = {
+  register: async (userData) => {
+    return new Promise((resolve) => {
       setTimeout(() => {
-        const existingUser = mockUsers.find(u => u.email === userData.email);
+        const users = JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS) || '[]');
+        const existingUser = users.find(u => u.email === userData.email);
         if (existingUser) {
-          reject(new Error('البريد الإلكتروني موجود بالفعل'));
+          resolve({ success: false, error: 'البريد الإلكتروني موجود بالفعل' });
           return;
         }
         
@@ -60,236 +54,254 @@ const mockAPI = {
             remainingInvitations: 50,
             expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
             status: 'active'
-          },
-          createdAt: new Date().toISOString()
+          }
         };
         
-        mockUsers.push(newUser);
-        localStorage.setItem('mock_users', JSON.stringify(mockUsers));
+        users.push(newUser);
+        localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+        localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(newUser));
         
-        const token = 'mock_token_' + Date.now();
-        localStorage.setItem('token', token);
-        localStorage.setItem('user', JSON.stringify(newUser));
-        
-        resolve({ success: true, token, user: newUser });
+        resolve({ success: true, token: 'mock_token', user: newUser });
       }, 500);
     });
   },
   
-  login: (email, password) => {
+  login: async (email, password) => {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        const user = mockUsers.find(u => u.email === email);
+        const users = JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS) || '[]');
+        const user = users.find(u => u.email === email);
         if (!user) {
           reject(new Error('البريد الإلكتروني أو كلمة المرور غير صحيحة'));
           return;
         }
-        
-        const token = 'mock_token_' + Date.now();
-        localStorage.setItem('token', token);
-        localStorage.setItem('user', JSON.stringify(user));
-        
-        resolve({ success: true, token, user });
+        localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(user));
+        resolve({ success: true, token: 'mock_token', user });
       }, 500);
     });
   },
   
   getMe: () => {
-    return new Promise((resolve) => {
-      const user = localStorage.getItem('user');
-      resolve({ success: true, user: user ? JSON.parse(user) : null });
-    });
+    const user = getCurrentUser();
+    return Promise.resolve({ success: true, user });
   },
   
-  getEvents: () => {
-    const events = JSON.parse(localStorage.getItem('mock_events') || '[]');
-    return Promise.resolve({ success: true, events });
-  },
-  
-  createEvent: (eventData) => {
-    return new Promise((resolve) => {
-      const user = JSON.parse(localStorage.getItem('user'));
-      const newEvent = {
-        id: Date.now().toString(),
-        ...eventData,
-        userId: user.uid,
-        uniqueLink: Math.random().toString(36).substring(2, 10),
-        status: 'draft',
-        totalGuests: 0,
-        confirmedGuests: 0,
-        declinedGuests: 0,
-        attendedGuests: 0,
-        createdAt: new Date().toISOString()
-      };
-      
-      const events = JSON.parse(localStorage.getItem('mock_events') || '[]');
-      events.push(newEvent);
-      localStorage.setItem('mock_events', JSON.stringify(events));
-      
-      resolve({ success: true, eventId: newEvent.id });
-    });
-  },
-  
-  deleteEvent: (eventId) => {
-    return new Promise((resolve) => {
-      let events = JSON.parse(localStorage.getItem('mock_events') || '[]');
-      events = events.filter(e => e.id !== eventId);
-      localStorage.setItem('mock_events', JSON.stringify(events));
-      resolve({ success: true });
-    });
-  },
-  
-  getEventById: (eventId) => {
-    return new Promise((resolve, reject) => {
-      const events = JSON.parse(localStorage.getItem('mock_events') || '[]');
-      const event = events.find(e => e.id === eventId);
-      if (event) {
-        resolve({ success: true, event });
-      } else {
-        reject(new Error('المناسبة غير موجودة'));
-      }
-    });
-  },
-  
-  getEventStats: (eventId) => {
-    return new Promise((resolve) => {
-      const events = JSON.parse(localStorage.getItem('mock_events') || '[]');
-      const event = events.find(e => e.id === eventId);
-      resolve({
-        success: true,
-        total: event?.totalGuests || 0,
-        confirmed: event?.confirmedGuests || 0,
-        declined: event?.declinedGuests || 0,
-        attended: event?.attendedGuests || 0
-      });
-    });
-  },
-  
-  getGuests: (eventId) => {
-    const guests = JSON.parse(localStorage.getItem(`mock_guests_${eventId}`) || '[]');
-    return Promise.resolve({ success: true, guests });
-  },
-  
-  addGuest: (eventId, guestData) => {
-    return new Promise((resolve) => {
-      const guests = JSON.parse(localStorage.getItem(`mock_guests_${eventId}`) || '[]');
-      const newGuest = {
-        id: Date.now().toString(),
-        ...guestData,
-        eventId,
-        status: 'pending',
-        createdAt: new Date().toISOString()
-      };
-      guests.push(newGuest);
-      localStorage.setItem(`mock_guests_${eventId}`, JSON.stringify(guests));
-      
-      // تحديث عدد الضيوف في المناسبة
-      const events = JSON.parse(localStorage.getItem('mock_events') || '[]');
-      const eventIndex = events.findIndex(e => e.id === eventId);
-      if (eventIndex !== -1) {
-        events[eventIndex].totalGuests = guests.length;
-        localStorage.setItem('mock_events', JSON.stringify(events));
-      }
-      
-      resolve({ success: true, guestId: newGuest.id });
-    });
-  },
-  
-  deleteGuest: (guestId) => {
-    return new Promise((resolve) => {
-      // البحث عن guest في جميع الأحداث
-      const events = JSON.parse(localStorage.getItem('mock_events') || '[]');
-      for (const event of events) {
-        let guests = JSON.parse(localStorage.getItem(`mock_guests_${event.id}`) || '[]');
-        const newGuests = guests.filter(g => g.id !== guestId);
-        if (newGuests.length !== guests.length) {
-          localStorage.setItem(`mock_guests_${event.id}`, JSON.stringify(newGuests));
-          event.totalGuests = newGuests.length;
-          localStorage.setItem('mock_events', JSON.stringify(events));
-          break;
-        }
-      }
-      resolve({ success: true });
-    });
+  logout: () => {
+    localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
+    return Promise.resolve({ success: true });
   },
   
   updateProfile: (data) => {
-    return new Promise((resolve) => {
-      const user = JSON.parse(localStorage.getItem('user'));
-      const updatedUser = { ...user, ...data };
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-      
-      // تحديث في mock_users
-      const mockUsersList = JSON.parse(localStorage.getItem('mock_users') || '[]');
-      const userIndex = mockUsersList.findIndex(u => u.email === user.email);
-      if (userIndex !== -1) {
-        mockUsersList[userIndex] = updatedUser;
-        localStorage.setItem('mock_users', JSON.stringify(mockUsersList));
-      }
-      
-      resolve({ success: true, user: updatedUser });
-    });
-  },
-  
-  changePassword: (oldPassword, newPassword) => {
-    return new Promise((resolve, reject) => {
-      // في النسخة التجريبية، نقبل أي كلمة مرور
-      resolve({ success: true });
-    });
-  },
-  
-  forgotPassword: (email) => {
-    return new Promise((resolve, reject) => {
-      const user = mockUsers.find(u => u.email === email);
-      if (!user) {
-        reject(new Error('البريد الإلكتروني غير موجود'));
-        return;
-      }
-      resolve({ success: true, message: 'تم إرسال رابط إعادة التعيين' });
-    });
+    const currentUser = getCurrentUser();
+    if (!currentUser) return Promise.resolve({ success: false, error: 'No user logged in' });
+    
+    const updatedUser = { ...currentUser, ...data };
+    localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(updatedUser));
+    
+    const users = JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS) || '[]');
+    const index = users.findIndex(u => u.uid === currentUser.uid);
+    if (index !== -1) users[index] = updatedUser;
+    localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+    
+    return Promise.resolve({ success: true, user: updatedUser });
   }
-};
-
-// Auth APIs
-export const authAPI = {
-  register: (userData) => mockAPI.register(userData),
-  login: (email, password) => mockAPI.login(email, password),
-  getMe: () => mockAPI.getMe(),
-  updateProfile: (data) => mockAPI.updateProfile(data),
-  changePassword: (oldPassword, newPassword) => mockAPI.changePassword(oldPassword, newPassword),
-  logout: () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    return Promise.resolve({ success: true });
-  },
-  forgotPassword: (email) => mockAPI.forgotPassword(email),
 };
 
 // Events APIs
 export const eventsAPI = {
-  getAll: () => mockAPI.getEvents(),
-  getById: (id) => mockAPI.getEventById(id),
-  create: (data) => mockAPI.createEvent(data),
-  update: (id, data) => Promise.resolve({ success: true }),
-  delete: (id) => mockAPI.deleteEvent(id),
-  getStats: (id) => mockAPI.getEventStats(id),
+  getAll: async () => {
+    const currentUser = getCurrentUser();
+    if (!currentUser) return { success: true, events: [] };
+    
+    const allEvents = getEvents();
+    const userEvents = allEvents.filter(e => e.userId === currentUser.uid);
+    return { success: true, events: userEvents };
+  },
+  
+  getById: async (id) => {
+    const allEvents = getEvents();
+    const event = allEvents.find(e => e.id === id);
+    if (event) {
+      return { success: true, event };
+    }
+    return { success: false, error: 'Event not found' };
+  },
+  
+  create: async (eventData) => {
+    const currentUser = getCurrentUser();
+    if (!currentUser) {
+      return { success: false, error: 'يجب تسجيل الدخول أولاً' };
+    }
+    
+    const allEvents = getEvents();
+    const newEvent = {
+      id: Date.now().toString(),
+      ...eventData,
+      userId: currentUser.uid,
+      uniqueLink: Math.random().toString(36).substring(2, 10),
+      status: 'draft',
+      totalGuests: 0,
+      confirmedGuests: 0,
+      declinedGuests: 0,
+      attendedGuests: 0,
+      createdAt: new Date().toISOString()
+    };
+    
+    allEvents.push(newEvent);
+    saveEvents(allEvents);
+    
+    return { success: true, eventId: newEvent.id };
+  },
+  
+  update: async (id, data) => {
+    const allEvents = getEvents();
+    const index = allEvents.findIndex(e => e.id === id);
+    if (index !== -1) {
+      allEvents[index] = { ...allEvents[index], ...data, updatedAt: new Date().toISOString() };
+      saveEvents(allEvents);
+      return { success: true };
+    }
+    return { success: false, error: 'Event not found' };
+  },
+  
+  delete: async (id) => {
+    const allEvents = getEvents();
+    const filteredEvents = allEvents.filter(e => e.id !== id);
+    saveEvents(filteredEvents);
+    localStorage.removeItem(`gaiah_guests_${id}`);
+    return { success: true };
+  },
+  
+  getStats: async (id) => {
+    const guests = getGuestsForEvent(id);
+    return {
+      success: true,
+      total: guests.length,
+      confirmed: guests.filter(g => g.status === 'confirmed').length,
+      declined: guests.filter(g => g.status === 'declined').length,
+      attended: guests.filter(g => g.status === 'attended').length
+    };
+  },
+  
+  updateMedia: async (id, mediaData) => {
+    const allEvents = getEvents();
+    const index = allEvents.findIndex(e => e.id === id);
+    if (index !== -1) {
+      allEvents[index] = { ...allEvents[index], ...mediaData };
+      saveEvents(allEvents);
+      return { success: true };
+    }
+    return { success: false, error: 'Event not found' };
+  }
 };
 
 // Guests APIs
 export const guestsAPI = {
-  getByEvent: (eventId) => mockAPI.getGuests(eventId),
-  add: (eventId, data) => mockAPI.addGuest(eventId, data),
-  update: (guestId, data) => Promise.resolve({ success: true }),
-  delete: (guestId) => mockAPI.deleteGuest(guestId),
-  bulkImport: (eventId, file) => Promise.resolve({ success: true }),
-  export: (eventId) => Promise.resolve(new Blob()),
-  sendInvitation: (guestId) => Promise.resolve({ success: true }),
+  getByEvent: async (eventId) => {
+    const guests = getGuestsForEvent(eventId);
+    return { success: true, guests };
+  },
+  
+  add: async (eventId, guestData) => {
+    const guests = getGuestsForEvent(eventId);
+    const newGuest = {
+      id: Date.now().toString(),
+      ...guestData,
+      eventId,
+      status: 'pending',
+      createdAt: new Date().toISOString()
+    };
+    guests.push(newGuest);
+    saveGuestsForEvent(eventId, guests);
+    
+    const allEvents = getEvents();
+    const eventIndex = allEvents.findIndex(e => e.id === eventId);
+    if (eventIndex !== -1) {
+      allEvents[eventIndex].totalGuests = guests.length;
+      saveEvents(allEvents);
+    }
+    
+    return { success: true, guestId: newGuest.id };
+  },
+  
+  delete: async (guestId) => {
+    const allEvents = getEvents();
+    for (const event of allEvents) {
+      let guests = getGuestsForEvent(event.id);
+      const newGuests = guests.filter(g => g.id !== guestId);
+      if (newGuests.length !== guests.length) {
+        saveGuestsForEvent(event.id, newGuests);
+        event.totalGuests = newGuests.length;
+        saveEvents(allEvents);
+        break;
+      }
+    }
+    return { success: true };
+  },
+  
+  bulkImport: async (eventId, guestsList) => {
+    const existingGuests = getGuestsForEvent(eventId);
+    const newGuests = guestsList.map(g => ({
+      id: Date.now().toString(),
+      ...g,
+      eventId,
+      status: 'pending',
+      createdAt: new Date().toISOString()
+    }));
+    const allGuests = [...existingGuests, ...newGuests];
+    saveGuestsForEvent(eventId, allGuests);
+    
+    const allEvents = getEvents();
+    const eventIndex = allEvents.findIndex(e => e.id === eventId);
+    if (eventIndex !== -1) {
+      allEvents[eventIndex].totalGuests = allGuests.length;
+      saveEvents(allEvents);
+    }
+    
+    return { success: true, imported: newGuests.length };
+  }
 };
 
 // Dashboard APIs
 export const dashboardAPI = {
-  getStats: () => Promise.resolve({ success: true, totalEvents: 0, totalGuests: 0, confirmationRate: 0 }),
-  getRecentEvents: () => mockAPI.getEvents(),
+  getStats: async () => {
+    const currentUser = getCurrentUser();
+    if (!currentUser) return { success: true, totalEvents: 0, totalGuests: 0, confirmationRate: 0 };
+    
+    const allEvents = getEvents();
+    const userEvents = allEvents.filter(e => e.userId === currentUser.uid);
+    
+    let totalGuests = 0;
+    let confirmedGuests = 0;
+    let attendedGuests = 0;
+    
+    for (const event of userEvents) {
+      const guests = getGuestsForEvent(event.id);
+      totalGuests += guests.length;
+      confirmedGuests += guests.filter(g => g.status === 'confirmed').length;
+      attendedGuests += guests.filter(g => g.status === 'attended').length;
+    }
+    
+    const confirmationRate = totalGuests > 0 ? ((confirmedGuests / totalGuests) * 100).toFixed(0) : 0;
+    
+    return {
+      success: true,
+      totalEvents: userEvents.length,
+      totalGuests,
+      confirmedGuests,
+      attendedGuests,
+      confirmationRate
+    };
+  },
+  
+  getRecentEvents: async () => {
+    const currentUser = getCurrentUser();
+    if (!currentUser) return { success: true, events: [] };
+    
+    const allEvents = getEvents();
+    const userEvents = allEvents.filter(e => e.userId === currentUser.uid);
+    return { success: true, events: userEvents.slice(0, 5) };
+  }
 };
 
 // Default export

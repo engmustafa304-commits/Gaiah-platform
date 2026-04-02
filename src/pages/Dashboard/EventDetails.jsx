@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../hooks/useToast';
@@ -15,6 +15,10 @@ const EventDetails = () => {
   const [event, setEvent] = useState(null);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showMediaModal, setShowMediaModal] = useState(false);
+  const [mediaPreview, setMediaPreview] = useState(null);
+  const [mediaFile, setMediaFile] = useState(null);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     fetchData();
@@ -22,7 +26,8 @@ const EventDetails = () => {
 
   const fetchData = async () => {
     try {
-      const [eventRes, statsRes] = await Promise.all([API.events.getById(eventId), API.events.getStats(eventId)]);
+      const eventRes = await API.events.getById(eventId);
+      const statsRes = await API.events.getStats(eventId);
       setEvent(eventRes.event);
       setStats(statsRes);
     } catch (error) {
@@ -32,15 +37,39 @@ const EventDetails = () => {
     }
   };
 
+  const handleMediaUpdate = async () => {
+    if (!mediaFile) {
+      showError('الرجاء اختيار صورة');
+      return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const mediaUrl = e.target.result;
+      await API.events.updateMedia(eventId, { mediaUrl, mediaType: 'image' });
+      setEvent({ ...event, mediaUrl, mediaType: 'image' });
+      showSuccess('تم تحديث صورة الدعوة بنجاح');
+      setShowMediaModal(false);
+      setMediaFile(null);
+      setMediaPreview(null);
+    };
+    reader.readAsDataURL(mediaFile);
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setMediaFile(file);
+      const previewUrl = URL.createObjectURL(file);
+      setMediaPreview(previewUrl);
+    }
+  };
+
   const handleDelete = async () => {
     if (window.confirm('هل أنت متأكد من حذف هذه المناسبة؟')) {
-      try {
-        await API.events.delete(eventId);
-        showSuccess('تم حذف المناسبة بنجاح');
-        navigate('/dashboard');
-      } catch (error) {
-        showError('فشل حذف المناسبة');
-      }
+      await API.events.delete(eventId);
+      showSuccess('تم حذف المناسبة بنجاح');
+      navigate('/dashboard');
     }
   };
 
@@ -50,22 +79,54 @@ const EventDetails = () => {
   return (
     <Layout>
       <Toast toast={toast} onClose={() => {}} />
+      
       <div className="mb-8">
-        <button onClick={() => navigate('/dashboard')} className="text-primary hover:underline mb-2 inline-block">← العودة إلى لوحة التحكم</button>
+        <button onClick={() => navigate('/dashboard')} className="text-primary hover:underline mb-2 inline-block">
+          ← العودة إلى لوحة التحكم
+        </button>
         <h1 className="text-2xl font-bold text-primary">{event.name}</h1>
         <p className="text-primary-light mt-1">{new Date(event.date).toLocaleDateString('ar-SA')}</p>
       </div>
+
       <div className="grid lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
+          {/* صورة الدعوة - إطار مناسب */}
+          <div className="bg-white rounded-xl shadow-md overflow-hidden">
+            <div className="relative">
+              {event.mediaUrl ? (
+                <div className="relative bg-gray-100 flex items-center justify-center min-h-[300px]">
+                  <img 
+                    src={event.mediaUrl} 
+                    alt="Event invitation" 
+                    className="w-full h-auto max-h-[500px] object-contain"
+                  />
+                </div>
+              ) : (
+                <div className="bg-gray-100 h-64 flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="text-5xl mb-2">🖼️</div>
+                    <p className="text-primary-light">لا توجد صورة دعوة</p>
+                  </div>
+                </div>
+              )}
+              <button
+                onClick={() => setShowMediaModal(true)}
+                className="absolute top-4 right-4 bg-white/90 hover:bg-white text-primary px-3 py-1 rounded-lg text-sm shadow-md transition"
+              >
+                ✏️ تغيير الصورة
+              </button>
+            </div>
+          </div>
+
           <div className="bg-white rounded-xl shadow-md p-6">
             <h2 className="text-lg font-bold text-primary mb-4">تفاصيل المناسبة</h2>
             <div className="space-y-3">
               <div className="flex items-center gap-3"><span className="text-primary-light w-24">الموقع:</span><span className="text-primary">{event.location?.name}</span></div>
               <div className="flex items-center gap-3"><span className="text-primary-light w-24">العنوان:</span><span className="text-primary">{event.location?.address || 'غير محدد'}</span></div>
               <div className="flex items-center gap-3"><span className="text-primary-light w-24">الوصف:</span><span className="text-primary">{event.description || 'لا يوجد وصف'}</span></div>
-              <div className="flex items-center gap-3"><span className="text-primary-light w-24">رابط الدعوة:</span><a href={`/invitation/${event.uniqueLink}`} target="_blank" className="text-primary hover:underline">{window.location.origin}/invitation/{event.uniqueLink}</a></div>
             </div>
           </div>
+
           <div className="bg-white rounded-xl shadow-md p-6">
             <h2 className="text-lg font-bold text-primary mb-4">إحصائيات سريعة</h2>
             <div className="grid grid-cols-2 gap-4">
@@ -76,6 +137,7 @@ const EventDetails = () => {
             </div>
           </div>
         </div>
+
         <div className="space-y-6">
           <div className="bg-white rounded-xl shadow-md p-6">
             <h2 className="text-lg font-bold text-primary mb-4">إجراءات سريعة</h2>
@@ -85,6 +147,7 @@ const EventDetails = () => {
               <button onClick={handleDelete} className="w-full bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition">حذف المناسبة</button>
             </div>
           </div>
+
           <div className="bg-white rounded-xl shadow-md p-6">
             <h2 className="text-lg font-bold text-primary mb-4">معلومات الاشتراك</h2>
             <div className="space-y-2">
@@ -94,6 +157,36 @@ const EventDetails = () => {
           </div>
         </div>
       </div>
+
+      {/* Edit Image Modal */}
+      {showMediaModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6">
+            <h3 className="text-xl font-bold text-primary mb-4">تغيير صورة الدعوة</h3>
+            <div className="space-y-4">
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-primary transition" onClick={() => fileInputRef.current.click()}>
+                <input type="file" ref={fileInputRef} accept="image/*" onChange={handleFileChange} className="hidden" />
+                {mediaPreview ? (
+                  <div>
+                    <img src={mediaPreview} alt="Preview" className="max-h-48 mx-auto rounded object-contain" />
+                    <p className="text-sm text-primary-light mt-2">اضغط لتغيير الصورة</p>
+                  </div>
+                ) : (
+                  <div>
+                    <div className="text-4xl mb-2">🖼️</div>
+                    <p className="text-primary-light">اضغط لرفع صورة جديدة</p>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button onClick={handleMediaUpdate} disabled={!mediaFile} className="flex-1 bg-primary text-white py-2 rounded-lg font-semibold hover:bg-primary-dark disabled:opacity-50">حفظ</button>
+                <button onClick={() => setShowMediaModal(false)} className="flex-1 border border-gray-300 text-primary-light py-2 rounded-lg hover:bg-gray-50">إلغاء</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </Layout>
   );
 };

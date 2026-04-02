@@ -20,35 +20,27 @@ const Dashboard = () => {
 
   const fetchDashboardData = async () => {
     try {
-      const eventsRes = await API.events.getAll();
+      const statsRes = await API.dashboard.getStats();
+      const eventsRes = await API.dashboard.getRecentEvents();
+      setStats(statsRes);
       setRecentEvents(eventsRes.events || []);
-      
-      let totalGuests = 0;
-      let confirmedGuests = 0;
-      let attendedGuests = 0;
-      
-      eventsRes.events?.forEach(event => {
-        totalGuests += event.totalGuests || 0;
-        confirmedGuests += event.confirmedGuests || 0;
-        attendedGuests += event.attendedGuests || 0;
-      });
-      
-      const confirmationRate = totalGuests > 0 
-        ? ((confirmedGuests / totalGuests) * 100).toFixed(0)
-        : 0;
-      
-      setStats({
-        totalEvents: eventsRes.events?.length || 0,
-        totalGuests: totalGuests,
-        confirmedGuests: confirmedGuests,
-        attendedGuests: attendedGuests,
-        confirmationRate: confirmationRate
-      });
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
       showError('فشل تحميل البيانات');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeleteEvent = async (eventId, eventName) => {
+    if (window.confirm(`هل أنت متأكد من حذف مناسبة "${eventName}"؟`)) {
+      try {
+        await API.events.delete(eventId);
+        showSuccess('تم حذف المناسبة بنجاح');
+        fetchDashboardData();
+      } catch (error) {
+        showError('فشل حذف المناسبة');
+      }
     }
   };
 
@@ -105,29 +97,26 @@ const Dashboard = () => {
 
       <div className="bg-white rounded-xl shadow-md overflow-hidden">
         <div className="p-6 border-b border-gray-100">
-          <h2 className="text-xl font-bold text-primary">أحدث المناسبات</h2>
+          <h2 className="text-xl font-bold text-primary">مناسباتي</h2>
         </div>
 
         {recentEvents.length === 0 ? (
           <div className="p-12 text-center text-gray-500">
             <div className="text-5xl mb-4">🎉</div>
             <p className="mb-4">لا توجد مناسبات بعد</p>
-            <Link
-              to="/create-event"
-              className="inline-block bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary-dark transition"
-            >
+            <Link to="/create-event" className="inline-block bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary-dark transition">
               إنشاء مناسبة جديدة
             </Link>
           </div>
         ) : (
           <div className="divide-y divide-gray-100">
-            {recentEvents.slice(0, 5).map((event) => (
+            {recentEvents.map((event) => (
               <div key={event.id} className="p-6 hover:bg-gray-50 transition">
                 <div className="flex justify-between items-center flex-wrap gap-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-3">
-                      {event.coverImage && (
-                        <img src={event.coverImage} alt={event.name} className="w-12 h-12 rounded-lg object-cover" />
+                      {event.mediaUrl && (
+                        <img src={event.mediaUrl} alt={event.name} className="w-12 h-12 rounded-lg object-cover" />
                       )}
                       <div>
                         <h3 className="font-semibold text-primary text-lg">{event.name}</h3>
@@ -139,18 +128,14 @@ const Dashboard = () => {
                     </div>
                   </div>
                   <div className="flex gap-3">
-                    <Link
-                      to={`/events/${event.id}`}
-                      className="text-primary hover:underline text-sm"
+                    <Link to={`/events/${event.id}`} className="text-primary hover:underline text-sm">تفاصيل</Link>
+                    <Link to={`/events/${event.id}/guests`} className="text-primary hover:underline text-sm">إدارة الضيوف</Link>
+                    <button
+                      onClick={() => handleDeleteEvent(event.id, event.name)}
+                      className="text-red-500 hover:text-red-700 text-sm"
                     >
-                      تفاصيل
-                    </Link>
-                    <Link
-                      to={`/events/${event.id}/guests`}
-                      className="text-primary hover:underline text-sm"
-                    >
-                      إدارة الضيوف
-                    </Link>
+                      حذف
+                    </button>
                   </div>
                 </div>
               </div>
