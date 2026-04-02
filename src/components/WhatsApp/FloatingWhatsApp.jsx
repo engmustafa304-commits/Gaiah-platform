@@ -99,7 +99,7 @@ ${formData.message || 'لا توجد ملاحظات'}
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-6 left-6 z-50">
+    <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 md:bottom-6 md:left-6 z-50">
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -107,7 +107,8 @@ ${formData.message || 'لا توجد ملاحظات'}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.9 }}
             transition={{ duration: 0.2 }}
-            className="absolute bottom-20 left-0 w-96 bg-white rounded-2xl shadow-2xl overflow-hidden"
+            className="absolute bottom-16 right-0 sm:bottom-20 sm:left-0 w-[calc(100vw-2rem)] sm:w-96 max-w-sm bg-white rounded-2xl shadow-2xl overflow-hidden"
+            style={{ right: 0, left: 'auto' }}
           >
             {/* Header */}
             <div className="bg-gradient-to-r from-green-600 to-green-500 p-4 text-white">
@@ -115,10 +116,11 @@ ${formData.message || 'لا توجد ملاحظات'}
                 <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
                   <span className="text-green-500 text-xl">📋</span>
                 </div>
-                <div>
-                  <h4 className="font-bold">طلب خدمة احترافي</h4>
+                <div className="flex-1">
+                  <h4 className="font-bold text-sm sm:text-base">طلب خدمة احترافي</h4>
                   <p className="text-xs text-green-100">املأ البيانات وسنرد عليك فوراً</p>
                 </div>
+                <button onClick={() => setIsOpen(false)} className="text-white text-xl">✕</button>
               </div>
               {/* Steps */}
               <div className="flex justify-between mt-4">
@@ -129,7 +131,7 @@ ${formData.message || 'لا توجد ملاحظات'}
                     }`}>
                       {s}
                     </div>
-                    {s < 4 && <div className={`w-8 h-0.5 mx-1 ${step > s ? 'bg-white' : 'bg-green-400'}`}></div>}
+                    {s < 4 && <div className={`w-8 sm:w-12 h-0.5 mx-1 ${step > s ? 'bg-white' : 'bg-green-400'}`}></div>}
                   </div>
                 ))}
               </div>
@@ -137,8 +139,8 @@ ${formData.message || 'لا توجد ملاحظات'}
 
             {/* Body - Step 1: المعلومات الشخصية */}
             {step === 1 && (
-              <div className="p-4">
-                <h5 className="font-bold text-primary mb-3">👤 معلوماتك الشخصية</h5>
+              <div className="p-4 max-h-[60vh] overflow-y-auto">
+                <h5 className="font-bold text-primary mb-3 text-sm">👤 معلوماتك الشخصية</h5>
                 <div className="space-y-3">
                   <div>
                     <label className="text-xs text-primary-light mb-1 block">الاسم *</label>
@@ -166,7 +168,7 @@ ${formData.message || 'لا توجد ملاحظات'}
                 <button
                   onClick={handleNext}
                   disabled={!formData.name || !formData.phone}
-                  className="w-full mt-6 bg-gradient-to-r from-green-600 to-green-500 text-white py-2 rounded-lg font-semibold hover:from-green-700 hover:to-green-600 transition disabled:opacity-50"
+                  className="w-full mt-6 bg-gradient-to-r from-green-600 to-green-500 text-white py-2 rounded-lg font-semibold hover:from-green-700 hover:to-green-600 transition disabled:opacity-50 text-sm"
                 >
                   التالي →
                 </button>
@@ -175,8 +177,8 @@ ${formData.message || 'لا توجد ملاحظات'}
 
             {/* Body - Step 2: تفاصيل المناسبة */}
             {step === 2 && (
-              <div className="p-4 max-h-96 overflow-y-auto">
-                <h5 className="font-bold text-primary mb-3">🎉 تفاصيل المناسبة</h5>
+              <div className="p-4 max-h-[60vh] overflow-y-auto">
+                <h5 className="font-bold text-primary mb-3 text-sm">🎉 تفاصيل المناسبة</h5>
                 <div className="space-y-3">
                   <div>
                     <label className="text-xs text-primary-light mb-1 block">نوع المناسبة *</label>
@@ -238,16 +240,16 @@ ${formData.message || 'لا توجد ملاحظات'}
                   </div>
                 </div>
                 <div className="flex gap-3 mt-6">
-                  <button onClick={handleBack} className="flex-1 bg-gray-100 text-primary py-2 rounded-lg">← رجوع</button>
-                  <button onClick={handleNext} className="flex-1 bg-gradient-to-r from-green-600 to-green-500 text-white py-2 rounded-lg font-semibold">التالي →</button>
+                  <button onClick={handleBack} className="flex-1 bg-gray-100 text-primary py-2 rounded-lg text-sm">← رجوع</button>
+                  <button onClick={handleNext} className="flex-1 bg-gradient-to-r from-green-600 to-green-500 text-white py-2 rounded-lg font-semibold text-sm">التالي →</button>
                 </div>
               </div>
             )}
 
             {/* Body - Step 3: الميزانية */}
             {step === 3 && (
-              <div className="p-4">
-                <h5 className="font-bold text-primary mb-3">💰 الميزانية المتوقعة</h5>
+              <div className="p-4 max-h-[60vh] overflow-y-auto">
+                <h5 className="font-bold text-primary mb-3 text-sm">💰 الميزانية المتوقعة</h5>
                 <div className="space-y-2">
                   {budgets.map((budget) => (
                     <button
@@ -265,16 +267,16 @@ ${formData.message || 'لا توجد ملاحظات'}
                   ))}
                 </div>
                 <div className="flex gap-3 mt-6">
-                  <button onClick={handleBack} className="flex-1 bg-gray-100 text-primary py-2 rounded-lg">← رجوع</button>
-                  <button onClick={handleNext} className="flex-1 bg-gradient-to-r from-green-600 to-green-500 text-white py-2 rounded-lg font-semibold">التالي →</button>
+                  <button onClick={handleBack} className="flex-1 bg-gray-100 text-primary py-2 rounded-lg text-sm">← رجوع</button>
+                  <button onClick={handleNext} className="flex-1 bg-gradient-to-r from-green-600 to-green-500 text-white py-2 rounded-lg font-semibold text-sm">التالي →</button>
                 </div>
               </div>
             )}
 
             {/* Body - Step 4: رسالة إضافية وإرسال */}
             {step === 4 && (
-              <div className="p-4">
-                <h5 className="font-bold text-primary mb-3">📝 رسالة إضافية</h5>
+              <div className="p-4 max-h-[60vh] overflow-y-auto">
+                <h5 className="font-bold text-primary mb-3 text-sm">📝 رسالة إضافية</h5>
                 <textarea
                   name="message"
                   value={formData.message}
@@ -285,17 +287,17 @@ ${formData.message || 'لا توجد ملاحظات'}
                 />
                 <div className="bg-gray-50 rounded-lg p-3 mt-4 text-xs text-primary-light">
                   <p className="font-semibold mb-1">📋 ملخص طلبك:</p>
-                  <p>الاسم: {formData.name || 'غير مدخل'}</p>
-                  <p>نوع المناسبة: {eventTypes.find(e => e.value === formData.eventType)?.label || 'غير محدد'}</p>
-                  <p>عدد المدعوين: {formData.guests || 'غير محدد'}</p>
-                  <p>الميزانية: {formData.budget || 'غير محددة'}</p>
+                  <p className="truncate">الاسم: {formData.name || 'غير مدخل'}</p>
+                  <p className="truncate">نوع المناسبة: {eventTypes.find(e => e.value === formData.eventType)?.label || 'غير محدد'}</p>
+                  <p className="truncate">عدد المدعوين: {formData.guests || 'غير محدد'}</p>
+                  <p className="truncate">الميزانية: {formData.budget || 'غير محددة'}</p>
                 </div>
                 <div className="flex gap-3 mt-6">
-                  <button onClick={handleBack} className="flex-1 bg-gray-100 text-primary py-2 rounded-lg">← رجوع</button>
+                  <button onClick={handleBack} className="flex-1 bg-gray-100 text-primary py-2 rounded-lg text-sm">← رجوع</button>
                   <button
                     onClick={handleSend}
                     disabled={isSent}
-                    className="flex-1 bg-gradient-to-r from-green-600 to-green-500 text-white py-2 rounded-lg font-semibold hover:from-green-700 hover:to-green-600 transition disabled:opacity-50"
+                    className="flex-1 bg-gradient-to-r from-green-600 to-green-500 text-white py-2 rounded-lg font-semibold hover:from-green-700 hover:to-green-600 transition disabled:opacity-50 text-sm"
                   >
                     {isSent ? '✓ تم الإرسال' : '📤 إرسال الطلب'}
                   </button>
@@ -306,19 +308,19 @@ ${formData.message || 'لا توجد ملاحظات'}
         )}
       </AnimatePresence>
 
-      {/* Floating Button */}
+      {/* Floating Button - محسن للهاتف */}
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
-        className="relative w-14 h-14 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group"
+        className="relative w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group"
       >
         {isOpen ? (
-          <span className="text-2xl">✕</span>
+          <span className="text-xl sm:text-2xl">✕</span>
         ) : (
           <>
-            <span className="text-2xl">💬</span>
-            <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full animate-pulse"></span>
+            <span className="text-xl sm:text-2xl">💬</span>
+            <span className="absolute -top-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 bg-red-500 rounded-full animate-pulse"></span>
           </>
         )}
       </motion.button>
