@@ -8,7 +8,7 @@ import Layout from '../../components/Layout';
 import LoadingSpinner from '../../components/LoadingSpinner';
 
 const Dashboard = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const { toast, showSuccess, showError } = useToast();
   const [stats, setStats] = useState(null);
   const [recentEvents, setRecentEvents] = useState([]);
@@ -46,11 +46,14 @@ const Dashboard = () => {
 
   if (loading) return <LoadingSpinner />;
 
+  // التحقق من وجود user
+  const remainingInvitations = user?.subscription?.remainingInvitations ?? 0;
+
   const statCards = [
     { title: 'إجمالي المناسبات', value: stats?.totalEvents || 0, icon: '🎉', color: 'from-blue-500 to-blue-600' },
     { title: 'إجمالي الضيوف', value: stats?.totalGuests || 0, icon: '👥', color: 'from-green-500 to-green-600' },
     { title: 'تأكيد الحضور', value: `${stats?.confirmationRate || 0}%`, icon: '✅', color: 'from-purple-500 to-purple-600' },
-    { title: 'الدعوات المتبقية', value: user?.subscription?.remainingInvitations || 0, icon: '📨', color: 'from-orange-500 to-orange-600' },
+    { title: 'الدعوات المتبقية', value: remainingInvitations, icon: '📨', color: 'from-orange-500 to-orange-600' },
   ];
 
   return (
@@ -58,7 +61,7 @@ const Dashboard = () => {
       <Toast toast={toast} onClose={() => {}} />
       
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-primary">مرحباً، {user?.displayName} 👋</h1>
+        <h1 className="text-2xl font-bold text-primary">مرحباً، {user?.displayName || 'مستخدم'} 👋</h1>
         <p className="text-primary-light mt-1">مرحباً بك في منصة جيّة لإدارة الدعوات الرقمية</p>
       </div>
 
@@ -74,6 +77,11 @@ const Dashboard = () => {
                 {card.icon}
               </div>
             </div>
+            {card.title === 'الدعوات المتبقية' && remainingInvitations === 0 && (
+              <Link to="/subscription" className="mt-3 text-xs text-primary underline block text-center">
+                نفذت الدعوات، اضغط لشراء باقة
+              </Link>
+            )}
           </div>
         ))}
       </div>

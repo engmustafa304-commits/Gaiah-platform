@@ -70,15 +70,11 @@ const CreateEvent = () => {
       let mediaType = formData.mediaType;
       
       if (formData.mediaFile) {
-        // تخزين الصورة كـ base64 مؤقتاً
         const reader = new FileReader();
         mediaUrl = await new Promise((resolve) => {
           reader.onload = (e) => resolve(e.target.result);
           reader.readAsDataURL(formData.mediaFile);
         });
-      } else if (formData.mediaType !== 'none') {
-        // صورة افتراضية إذا لم يرفع المستخدم صورة
-        mediaUrl = 'https://images.unsplash.com/photo-1519741497674-611481863552?w=800&h=500&fit=crop';
       }
       
       const result = await API.events.create({
@@ -97,6 +93,9 @@ const CreateEvent = () => {
       if (result.success) {
         showSuccess('تم إنشاء المناسبة بنجاح');
         setTimeout(() => navigate('/dashboard'), 1500);
+      } else if (result.needUpgrade) {
+        showError(result.error);
+        setTimeout(() => navigate('/subscription'), 2000);
       } else {
         showError(result.error || 'فشل إنشاء المناسبة');
       }
@@ -114,6 +113,11 @@ const CreateEvent = () => {
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-primary">إنشاء مناسبة جديدة</h1>
           <p className="text-primary-light mt-1">أدخل تفاصيل مناسبتك وحدد الموقع على الخريطة</p>
+          {user?.subscription?.remainingInvitations <= 0 && (
+            <div className="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-700 text-sm">
+              ⚠️ لا توجد دعوات متبقية. يرجى شراء باقة اشتراك للاستمرار.
+            </div>
+          )}
         </div>
 
         <div className="bg-white rounded-xl shadow-md p-6">
@@ -154,7 +158,7 @@ const CreateEvent = () => {
             </div>
 
             <div>
-              <label className="block text-primary font-semibold mb-2">صورة الدعوة</label>
+              <label className="block text-primary font-semibold mb-2">وسائط الدعوة</label>
               <div className="grid grid-cols-3 gap-4 mb-4">
                 <label className="flex items-center gap-2">
                   <input
@@ -164,7 +168,17 @@ const CreateEvent = () => {
                     checked={formData.mediaType === 'image'}
                     onChange={handleChange}
                   />
-                  رفع صورة
+                  صورة
+                </label>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="mediaType"
+                    value="video"
+                    checked={formData.mediaType === 'video'}
+                    onChange={handleChange}
+                  />
+                  فيديو
                 </label>
                 <label className="flex items-center gap-2">
                   <input
@@ -174,23 +188,29 @@ const CreateEvent = () => {
                     checked={formData.mediaType === 'none'}
                     onChange={handleChange}
                   />
-                  بدون صورة
+                  بدون
                 </label>
               </div>
 
-              {formData.mediaType === 'image' && (
+              {formData.mediaType !== 'none' && (
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-primary transition" onClick={() => fileInputRef.current.click()}>
-                  <input type="file" ref={fileInputRef} accept="image/*" onChange={handleFileChange} className="hidden" />
+                  <input type="file" ref={fileInputRef} accept={formData.mediaType === 'image' ? 'image/*' : 'video/*'} onChange={handleFileChange} className="hidden" />
                   {mediaPreview ? (
                     <div>
-                      <img src={mediaPreview} alt="Preview" className="max-h-48 mx-auto rounded object-contain" />
-                      <p className="text-sm text-primary-light mt-2">اضغط لتغيير الصورة</p>
+                      {formData.mediaType === 'image' ? (
+                        <img src={mediaPreview} alt="Preview" className="max-h-48 mx-auto rounded object-contain" />
+                      ) : (
+                        <video src={mediaPreview} controls className="max-h-48 mx-auto rounded" />
+                      )}
+                      <p className="text-sm text-primary-light mt-2">اضغط لتغيير الملف</p>
                     </div>
                   ) : (
                     <div>
-                      <div className="text-4xl mb-2">🖼️</div>
-                      <p className="text-primary-light">اضغط لرفع صورة الدعوة</p>
-                      <p className="text-xs text-primary-light mt-1">يدعم JPG, PNG, WebP</p>
+                      <div className="text-4xl mb-2">{formData.mediaType === 'image' ? '🖼️' : '🎬'}</div>
+                      <p className="text-primary-light">اضغط لرفع {formData.mediaType === 'image' ? 'صورة' : 'فيديو'} الدعوة</p>
+                      <p className="text-xs text-primary-light mt-1">
+                        {formData.mediaType === 'image' ? 'يدعم JPG, PNG, WebP' : 'يدعم MP4, MOV, AVI (حد أقصى 50MB)'}
+                      </p>
                     </div>
                   )}
                 </div>
@@ -211,7 +231,7 @@ const CreateEvent = () => {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || user?.subscription?.remainingInvitations <= 0}
               className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary-dark transition disabled:opacity-50"
             >
               {loading ? 'جاري الإنشاء...' : 'إنشاء المناسبة'}

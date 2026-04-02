@@ -18,6 +18,7 @@ const EventDetails = () => {
   const [showMediaModal, setShowMediaModal] = useState(false);
   const [mediaPreview, setMediaPreview] = useState(null);
   const [mediaFile, setMediaFile] = useState(null);
+  const [mediaType, setMediaType] = useState('image');
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -39,16 +40,16 @@ const EventDetails = () => {
 
   const handleMediaUpdate = async () => {
     if (!mediaFile) {
-      showError('الرجاء اختيار صورة');
+      showError('الرجاء اختيار ملف');
       return;
     }
     
     const reader = new FileReader();
     reader.onload = async (e) => {
       const mediaUrl = e.target.result;
-      await API.events.updateMedia(eventId, { mediaUrl, mediaType: 'image' });
-      setEvent({ ...event, mediaUrl, mediaType: 'image' });
-      showSuccess('تم تحديث صورة الدعوة بنجاح');
+      await API.events.updateMedia(eventId, { mediaUrl, mediaType });
+      setEvent({ ...event, mediaUrl, mediaType });
+      showSuccess('تم تحديث وسائط الدعوة بنجاح');
       setShowMediaModal(false);
       setMediaFile(null);
       setMediaPreview(null);
@@ -90,22 +91,30 @@ const EventDetails = () => {
 
       <div className="grid lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
-          {/* صورة الدعوة - إطار مناسب */}
+          {/* Media Section */}
           <div className="bg-white rounded-xl shadow-md overflow-hidden">
             <div className="relative">
               {event.mediaUrl ? (
                 <div className="relative bg-gray-100 flex items-center justify-center min-h-[300px]">
-                  <img 
-                    src={event.mediaUrl} 
-                    alt="Event invitation" 
-                    className="w-full h-auto max-h-[500px] object-contain"
-                  />
+                  {event.mediaType === 'video' ? (
+                    <video 
+                      src={event.mediaUrl} 
+                      controls 
+                      className="w-full max-h-[500px] object-contain"
+                    />
+                  ) : (
+                    <img 
+                      src={event.mediaUrl} 
+                      alt="Event invitation" 
+                      className="w-full max-h-[500px] object-contain"
+                    />
+                  )}
                 </div>
               ) : (
                 <div className="bg-gray-100 h-64 flex items-center justify-center">
                   <div className="text-center">
                     <div className="text-5xl mb-2">🖼️</div>
-                    <p className="text-primary-light">لا توجد صورة دعوة</p>
+                    <p className="text-primary-light">لا توجد وسائط دعوة</p>
                   </div>
                 </div>
               )}
@@ -113,7 +122,7 @@ const EventDetails = () => {
                 onClick={() => setShowMediaModal(true)}
                 className="absolute top-4 right-4 bg-white/90 hover:bg-white text-primary px-3 py-1 rounded-lg text-sm shadow-md transition"
               >
-                ✏️ تغيير الصورة
+                ✏️ تغيير الوسائط
               </button>
             </div>
           </div>
@@ -158,23 +167,39 @@ const EventDetails = () => {
         </div>
       </div>
 
-      {/* Edit Image Modal */}
+      {/* Edit Media Modal */}
       {showMediaModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-md w-full p-6">
-            <h3 className="text-xl font-bold text-primary mb-4">تغيير صورة الدعوة</h3>
+            <h3 className="text-xl font-bold text-primary mb-4">تغيير وسائط الدعوة</h3>
             <div className="space-y-4">
+              <div>
+                <label className="block text-primary text-sm font-medium mb-2">نوع الوسائط</label>
+                <div className="flex gap-4">
+                  <label className="flex items-center gap-2">
+                    <input type="radio" value="image" checked={mediaType === 'image'} onChange={(e) => setMediaType(e.target.value)} /> صورة
+                  </label>
+                  <label className="flex items-center gap-2">
+                    <input type="radio" value="video" checked={mediaType === 'video'} onChange={(e) => setMediaType(e.target.value)} /> فيديو
+                  </label>
+                </div>
+              </div>
+
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-primary transition" onClick={() => fileInputRef.current.click()}>
-                <input type="file" ref={fileInputRef} accept="image/*" onChange={handleFileChange} className="hidden" />
+                <input type="file" ref={fileInputRef} accept={mediaType === 'image' ? 'image/*' : 'video/*'} onChange={handleFileChange} className="hidden" />
                 {mediaPreview ? (
                   <div>
-                    <img src={mediaPreview} alt="Preview" className="max-h-48 mx-auto rounded object-contain" />
-                    <p className="text-sm text-primary-light mt-2">اضغط لتغيير الصورة</p>
+                    {mediaType === 'image' ? (
+                      <img src={mediaPreview} alt="Preview" className="max-h-48 mx-auto rounded object-contain" />
+                    ) : (
+                      <video src={mediaPreview} controls className="max-h-48 mx-auto rounded" />
+                    )}
+                    <p className="text-sm text-primary-light mt-2">اضغط لتغيير الملف</p>
                   </div>
                 ) : (
                   <div>
-                    <div className="text-4xl mb-2">🖼️</div>
-                    <p className="text-primary-light">اضغط لرفع صورة جديدة</p>
+                    <div className="text-4xl mb-2">{mediaType === 'image' ? '🖼️' : '🎬'}</div>
+                    <p className="text-primary-light">اضغط لرفع {mediaType === 'image' ? 'صورة' : 'فيديو'}</p>
                   </div>
                 )}
               </div>

@@ -49,9 +49,9 @@ export const authAPI = {
           role: 'client',
           subscription: {
             plan: 'free',
-            totalInvitations: 50,
+            totalInvitations: 1,        // دعوة تجريبية واحدة فقط
             usedInvitations: 0,
-            remainingInvitations: 50,
+            remainingInvitations: 1,    // دعوة واحدة متبقية
             expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
             status: 'active'
           }
@@ -133,6 +133,15 @@ export const eventsAPI = {
       return { success: false, error: 'يجب تسجيل الدخول أولاً' };
     }
     
+    // التحقق من وجود دعوات متبقية
+    if (currentUser.subscription.remainingInvitations <= 0) {
+      return { 
+        success: false, 
+        error: '⚠️ انتهت الدعوات التجريبية. يرجى شراء باقة اشتراك للاستمرار',
+        needUpgrade: true 
+      };
+    }
+    
     const allEvents = getEvents();
     const newEvent = {
       id: Date.now().toString(),
@@ -149,6 +158,23 @@ export const eventsAPI = {
     
     allEvents.push(newEvent);
     saveEvents(allEvents);
+    
+    // تحديث عدد الدعوات المستخدمة
+    const updatedUser = {
+      ...currentUser,
+      subscription: {
+        ...currentUser.subscription,
+        usedInvitations: currentUser.subscription.usedInvitations + 1,
+        remainingInvitations: currentUser.subscription.remainingInvitations - 1
+      }
+    };
+    localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(updatedUser));
+    
+    // تحديث في قائمة المستخدمين
+    const users = JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS) || '[]');
+    const index = users.findIndex(u => u.uid === currentUser.uid);
+    if (index !== -1) users[index] = updatedUser;
+    localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
     
     return { success: true, eventId: newEvent.id };
   },
