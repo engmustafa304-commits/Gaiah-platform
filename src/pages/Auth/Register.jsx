@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import API from '../utils/api';
+import { useAuth } from '../../hooks/useAuth';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -12,6 +12,7 @@ const Register = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const { register } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -29,21 +30,19 @@ const Register = () => {
       return;
     }
 
-    try {
-      const response = await API.auth.register({
-        displayName: formData.displayName,
-        email: formData.email,
-        phone: formData.phone,
-        password: formData.password
-      });
-      localStorage.setItem('token', response.token);
-      localStorage.setItem('user', JSON.stringify(response.user));
+    const result = await register({
+      displayName: formData.displayName,
+      email: formData.email,
+      phone: formData.phone,
+      password: formData.password
+    });
+
+    if (result.success) {
       navigate('/dashboard');
-    } catch (err) {
-      setError(err.message || 'فشل إنشاء الحساب');
-    } finally {
-      setLoading(false);
+    } else {
+      setError(result.error || 'فشل إنشاء الحساب');
     }
+    setLoading(false);
   };
 
   return (

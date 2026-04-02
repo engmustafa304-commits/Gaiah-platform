@@ -1,80 +1,81 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
-import api from '../utils/api';
+import React, { createContext, useState, useEffect, useCallback } from 'react';
+import API from '../utils/api';
 
-const AuthContext = createContext();
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within AuthProvider');
-  }
-  return context;
-};
+export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [token, setToken] = useState(localStorage.getItem('token'));
+  const [error, setError] = useState(null);
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
     if (token) {
       fetchUser();
     } else {
       setLoading(false);
     }
-  }, [token]);
+  }, []);
 
   const fetchUser = async () => {
     try {
-      const response = await api.get('/auth/me');
-      setUser(response.data);
-    } catch (error) {
-      console.error('Failed to fetch user:', error);
-      logout();
+      const response = await API.auth.getMe();
+      setUser(response.user);
+    } catch (err) {
+      localStorage.removeItem('token');
     } finally {
       setLoading(false);
     }
   };
 
-  const login = async (email, password) => {
+  const register = useCallback(async (userData) => {
     try {
-      const response = await api.post('/auth/login', { email, password });
-      const { token, user } = response.data;
-      localStorage.setItem('token', token);
-      setToken(token);
-      setUser(user);
+      const response = await API.auth.register(userData);
+      localStorage.setItem('token', response.token);
+      setUser(response.user);
       return { success: true };
-    } catch (error) {
-      return { success: false, error: error.response?.data?.error || 'Login failed' };
+    } catch (err) {
+      setError(err.message || 'فشل إنشاء الحساب');
+      return { success: false, error: err.message };
     }
-  };
+  }, []);
 
-  const register = async (userData) => {
+  const login = useCallback(async (email, password) => {
     try {
-      const response = await api.post('/auth/register', userData);
-      const { token, user } = response.data;
-      localStorage.setItem('token', token);
-      setToken(token);
-      setUser(user);
+      const response = await API.auth.login(email, password);
+      localStorage.setItem('token', response.token);
+      setUser(response.user);
       return { success: true };
-    } catch (error) {
-      return { success: false, error: error.response?.data?.error || 'Registration failed' };
+    } catch (err) {
+      setError(err.message || 'فشل تسجيل الدخول');
+      return { success: false, error: err.message };
     }
-  };
+  }, []);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     localStorage.removeItem('token');
-    setToken(null);
     setUser(null);
-  };
+  }, []);
+
+  const updateProfile = useCallback(async (data) => {
+    try {
+      const response = await API.auth.updateProfile(data);
+      setUser(prev => ({ ...prev, ...response.user }));
+      return { success: true };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  }, []);
 
   const value = {
     user,
     loading,
-    isAuthenticated: !!user,
-    login,
+    error,
     register,
-    logout
+    login,
+    logout,
+    updateProfile,
+    isAuthenticated: !!user,
   };
 
   return (

@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import API from '../utils/api';
+import { useAuth } from '../../hooks/useAuth';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -14,16 +15,13 @@ const Login = () => {
     setLoading(true);
     setError('');
 
-    try {
-      const response = await API.auth.login(email, password);
-      localStorage.setItem('token', response.token);
-      localStorage.setItem('user', JSON.stringify(response.user));
+    const result = await login(email, password);
+    if (result.success) {
       navigate('/dashboard');
-    } catch (err) {
-      setError(err.message || 'فشل تسجيل الدخول');
-    } finally {
-      setLoading(false);
+    } else {
+      setError(result.error || 'فشل تسجيل الدخول');
     }
+    setLoading(false);
   };
 
   return (
@@ -42,9 +40,7 @@ const Login = () => {
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div>
-            <label className="block text-primary text-sm font-semibold mb-2">
-              البريد الإلكتروني
-            </label>
+            <label className="block text-primary text-sm font-semibold mb-2">البريد الإلكتروني</label>
             <input
               type="email"
               value={email}
@@ -56,9 +52,7 @@ const Login = () => {
           </div>
 
           <div>
-            <label className="block text-primary text-sm font-semibold mb-2">
-              كلمة المرور
-            </label>
+            <label className="block text-primary text-sm font-semibold mb-2">كلمة المرور</label>
             <input
               type="password"
               value={password}
@@ -67,6 +61,12 @@ const Login = () => {
               className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
               placeholder="••••••••"
             />
+          </div>
+
+          <div className="flex justify-between items-center">
+            <Link to="/forgot-password" className="text-sm text-primary hover:underline">
+              نسيت كلمة المرور؟
+            </Link>
           </div>
 
           <button

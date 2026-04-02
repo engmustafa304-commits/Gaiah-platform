@@ -1,42 +1,58 @@
 import React from 'react'
+import { Link } from 'react-router-dom';
 
 const Hero = () => {
   return (
-    <section className="relative min-h-screen overflow-hidden">
+    <section className="relative min-h-screen flex items-end overflow-hidden">
 
       {/* الخلفية */}
       <div className="absolute inset-0 z-0">
         <img 
           src="/images/hero-bg.jpg" 
           alt="Hero Background"
-          className="w-full h-full object-cover brightness-110 contrast-110"
-          style={{ 
-            objectPosition: 'center 35%',
-          }}
+          className="w-full h-full object-cover brightness-100 contrast-105"
+          style={{ objectPosition: 'center 30%' }}
           onError={(e) => {
             e.target.src = 'https://images.unsplash.com/photo-1519741497674-611481863552'
           }}
         />
 
-        {/* Gradient احترافي من اليمين */}
-        <div className="absolute inset-0 bg-gradient-to-l from-black/85 via-black/50 to-transparent"></div>
+        {/* Overlay قوي من جهة النص */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent"></div>
       </div>
 
-      {/* المحتوى - يمين تحت مع تحسين للهاتف */}
-      <div className="absolute bottom-8 sm:bottom-12 right-4 sm:right-10 md:right-16 z-20 max-w-sm sm:max-w-md md:max-w-xl text-white text-right">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-3 sm:mb-4 leading-tight drop-shadow-2xl">
-          حوّل مناسبتك إلى{' '}
-          <span className="block text-[#3a7a7a] mt-2">
-            تجربة رقمية أنيقة
-          </span>
-        </h1>
-        <p className="text-xs sm:text-sm md:text-base lg:text-lg text-gray-200 mb-4 sm:mb-6 leading-relaxed drop-shadow-md">
-          <span className="text-[#6a9a9a] font-semibold">دعوات إلكترونية</span>{' '}
-          بتصميم فاخر وتجربة سلسة لضيوفك
-        </p>
-        <button className="bg-white text-black px-5 sm:px-7 md:px-9 py-2 sm:py-3 rounded-full text-xs sm:text-sm md:text-base font-semibold hover:bg-gray-200 transition-all duration-300 shadow-xl hover:scale-105">
-          ابدأ الآن
-        </button>
+      {/* المحتوى */}
+      <div className="relative z-20 w-full px-6 sm:px-10 lg:px-16 pb-28 sm:pb-32 lg:pb-40">
+        <div className="flex justify-start items-end min-h-screen">
+
+          <div className="max-w-xl text-left text-white">
+
+            {/* العنوان */}
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight drop-shadow-2xl">
+              حوّل مناسبتك إلى{' '}
+              <span className="block text-[#3a7a7a] mt-2 drop-shadow-2xl">
+                تجربة رقمية أنيقة
+              </span>
+            </h1>
+
+            {/* الوصف */}
+            <p className="text-base sm:text-lg md:text-xl text-gray-100 mb-6 leading-relaxed drop-shadow-md">
+              <span className="text-[#6a9a9a] font-semibold">
+                دعوات إلكترونية
+              </span>{' '}
+              بتصميم فاخر وتجربة سلسة لضيوفك
+            </p>
+
+            {/* زر */}
+            <Link to="/login">
+              <button className="bg-white text-black px-8 py-3 rounded-full text-lg font-semibold hover:bg-gray-200 transition-all shadow-xl">
+                ابدأ الآن
+              </button>
+            </Link>
+
+          </div>
+
+        </div>
       </div>
 
     </section>
