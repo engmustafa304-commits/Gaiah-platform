@@ -1,8 +1,19 @@
-import React, { createContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import API from '../utils/api';
 
-export const AuthContext = createContext();
+// إنشاء Context
+const AuthContext = createContext();
 
+// Hook مخصص للاستخدام
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within AuthProvider');
+  }
+  return context;
+};
+
+// Provider component
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -28,44 +39,34 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = useCallback(async (userData) => {
+  const register = async (userData) => {
     try {
       const response = await API.auth.register(userData);
       localStorage.setItem('token', response.token);
       setUser(response.user);
       return { success: true };
     } catch (err) {
-      setError(err.message || 'فشل إنشاء الحساب');
+      setError(err.message);
       return { success: false, error: err.message };
     }
-  }, []);
+  };
 
-  const login = useCallback(async (email, password) => {
+  const login = async (email, password) => {
     try {
       const response = await API.auth.login(email, password);
       localStorage.setItem('token', response.token);
       setUser(response.user);
       return { success: true };
     } catch (err) {
-      setError(err.message || 'فشل تسجيل الدخول');
+      setError(err.message);
       return { success: false, error: err.message };
     }
-  }, []);
+  };
 
-  const logout = useCallback(() => {
+  const logout = () => {
     localStorage.removeItem('token');
     setUser(null);
-  }, []);
-
-  const updateProfile = useCallback(async (data) => {
-    try {
-      const response = await API.auth.updateProfile(data);
-      setUser(prev => ({ ...prev, ...response.user }));
-      return { success: true };
-    } catch (err) {
-      return { success: false, error: err.message };
-    }
-  }, []);
+  };
 
   const value = {
     user,
@@ -74,13 +75,11 @@ export const AuthProvider = ({ children }) => {
     register,
     login,
     logout,
-    updateProfile,
     isAuthenticated: !!user,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
+
+// تصدير AuthContext للاستخدام في useAuth
+export { AuthContext };

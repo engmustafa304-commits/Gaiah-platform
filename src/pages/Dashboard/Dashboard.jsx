@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-import { useToast } from '../../hooks/useToast';
-import Toast from '../../components/Toast';
 import API from '../../utils/api';
-import Layout from '../../components/Layout';
-import LoadingSpinner from '../../components/LoadingSpinner';
+import Navbar from '../../components/Navbar';
+import Footer from '../../components/Footer';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title } from 'chart.js';
+import { Pie, Bar } from 'react-chartjs-2';
+
+ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title);
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
-  const { toast, showSuccess, showError } = useToast();
+  const [events, setEvents] = useState([]);
   const [stats, setStats] = useState(null);
-  const [recentEvents, setRecentEvents] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -20,139 +21,136 @@ const Dashboard = () => {
 
   const fetchDashboardData = async () => {
     try {
+      const eventsRes = await API.events.getAll();
       const statsRes = await API.dashboard.getStats();
-      const eventsRes = await API.dashboard.getRecentEvents();
+      setEvents(eventsRes.events || []);
       setStats(statsRes);
-      setRecentEvents(eventsRes.events || []);
     } catch (error) {
-      console.error('Error fetching dashboard data:', error);
-      showError('فشل تحميل البيانات');
+      console.error('Error:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDeleteEvent = async (eventId, eventName) => {
-    if (window.confirm(`هل أنت متأكد من حذف مناسبة "${eventName}"؟`)) {
-      try {
-        await API.events.delete(eventId);
-        showSuccess('تم حذف المناسبة بنجاح');
-        fetchDashboardData();
-      } catch (error) {
-        showError('فشل حذف المناسبة');
-      }
-    }
+  // بيانات الرسم البياني للحضور
+  const attendanceData = {
+    labels: ['مؤكد حضور', 'معتذر', 'حضر فعلياً', 'لم يحضر', 'لم يرد'],
+    datasets: [{
+      label: 'الضيوف',
+      data: [
+        stats?.confirmedGuests || 0,
+        stats?.declinedGuests || 0,
+        stats?.attendedGuests || 0,
+        stats?.notAttendedGuests || 0,
+        stats?.noResponseGuests || 0
+      ],
+      backgroundColor: ['#10b981', '#ef4444', '#3b82f6', '#f59e0b', '#9ca3af'],
+      borderWidth: 0
+    }]
   };
 
-  if (loading) return <LoadingSpinner />;
+  // بيانات الرسم البياني للرسائل
+  const messagesData = {
+    labels: ['قرأ الرسالة', 'لم يقرأ بعد'],
+    datasets: [{
+      label: 'الرسائل',
+      data: [stats?.readMessages || 0, (stats?.totalGuests || 0) - (stats?.readMessages || 0)],
+      backgroundColor: ['#8b5cf6', '#e5e7eb'],
+      borderWidth: 0
+    }]
+  };
 
-  // التحقق من وجود user
-  const remainingInvitations = user?.subscription?.remainingInvitations ?? 0;
+  // خيارات الرسوم البيانية
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { position: 'bottom', rtl: true } }
+  };
 
-  const statCards = [
-    { title: 'إجمالي المناسبات', value: stats?.totalEvents || 0, icon: '🎉', color: 'from-blue-500 to-blue-600' },
-    { title: 'إجمالي الضيوف', value: stats?.totalGuests || 0, icon: '👥', color: 'from-green-500 to-green-600' },
-    { title: 'تأكيد الحضور', value: `${stats?.confirmationRate || 0}%`, icon: '✅', color: 'from-purple-500 to-purple-600' },
-    { title: 'الدعوات المتبقية', value: remainingInvitations, icon: '📨', color: 'from-orange-500 to-orange-600' },
-  ];
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return (
-    <Layout>
-      <Toast toast={toast} onClose={() => {}} />
-      
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-primary">مرحباً، {user?.displayName || 'مستخدم'} 👋</h1>
-        <p className="text-primary-light mt-1">مرحباً بك في منصة جيّة لإدارة الدعوات الرقمية</p>
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {statCards.map((card, idx) => (
-          <div key={idx} className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-primary-light text-sm">{card.title}</p>
-                <p className="text-3xl font-bold text-primary mt-2">{card.value}</p>
-              </div>
-              <div className={`w-12 h-12 bg-gradient-to-r ${card.color} rounded-xl flex items-center justify-center text-white text-2xl`}>
-                {card.icon}
-              </div>
-            </div>
-            {card.title === 'الدعوات المتبقية' && remainingInvitations === 0 && (
-              <Link to="/subscription" className="mt-3 text-xs text-primary underline block text-center">
-                نفذت الدعوات، اضغط لشراء باقة
-              </Link>
-            )}
-          </div>
-        ))}
-      </div>
-
-      <div className="mb-8 flex flex-wrap gap-4">
-        <Link
-          to="/create-event"
-          className="bg-primary text-white px-6 py-3 rounded-lg inline-flex items-center gap-2 hover:bg-primary-dark transition shadow-md hover:shadow-lg"
-        >
-          <span className="text-xl">+</span>
-          إنشاء مناسبة جديدة
-        </Link>
-        <Link
-          to="/analytics"
-          className="bg-gray-100 text-primary px-6 py-3 rounded-lg inline-flex items-center gap-2 hover:bg-gray-200 transition"
-        >
-          <span className="text-xl">📊</span>
-          عرض التحليلات
-        </Link>
-      </div>
-
-      <div className="bg-white rounded-xl shadow-md overflow-hidden">
-        <div className="p-6 border-b border-gray-100">
-          <h2 className="text-xl font-bold text-primary">مناسباتي</h2>
+    <div className="min-h-screen bg-gray-50">
+      <Navbar />
+      <div className="container mx-auto px-4 pt-24 pb-12">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-primary to-primary-dark rounded-2xl p-6 text-white mb-8">
+          <h1 className="text-2xl font-bold">مرحباً، {user?.displayName || 'مستخدم'} 👋</h1>
+          <p className="text-gray-200 mt-1">منصتك لإدارة الدعوات الإلكترونية</p>
         </div>
 
-        {recentEvents.length === 0 ? (
-          <div className="p-12 text-center text-gray-500">
-            <div className="text-5xl mb-4">🎉</div>
-            <p className="mb-4">لا توجد مناسبات بعد</p>
-            <Link to="/create-event" className="inline-block bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary-dark transition">
-              إنشاء مناسبة جديدة
-            </Link>
+        {/* بطاقات الإحصائيات الرئيسية */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-4 mb-8">
+          <div className="bg-white rounded-xl p-4 shadow-md text-center"><div className="text-2xl font-bold text-primary">{stats?.totalEvents || 0}</div><div className="text-xs text-primary-light">مناسبات</div></div>
+          <div className="bg-white rounded-xl p-4 shadow-md text-center"><div className="text-2xl font-bold text-primary">{stats?.totalGuests || 0}</div><div className="text-xs text-primary-light">إجمالي الضيوف</div></div>
+          <div className="bg-white rounded-xl p-4 shadow-md text-center"><div className="text-2xl font-bold text-green-600">{stats?.confirmedGuests || 0}</div><div className="text-xs text-primary-light">✅ مؤكد</div></div>
+          <div className="bg-white rounded-xl p-4 shadow-md text-center"><div className="text-2xl font-bold text-red-500">{stats?.declinedGuests || 0}</div><div className="text-xs text-primary-light">❌ معتذر</div></div>
+          <div className="bg-white rounded-xl p-4 shadow-md text-center"><div className="text-2xl font-bold text-blue-500">{stats?.attendedGuests || 0}</div><div className="text-xs text-primary-light">🎉 حضر فعلياً</div></div>
+          <div className="bg-white rounded-xl p-4 shadow-md text-center"><div className="text-2xl font-bold text-purple-600">{stats?.readMessages || 0}</div><div className="text-xs text-primary-light">📖 قرأ الرسالة</div></div>
+          <div className="bg-white rounded-xl p-4 shadow-md text-center"><div className="text-2xl font-bold text-gray-500">{stats?.noResponseGuests || 0}</div><div className="text-xs text-primary-light">⏳ لم يرد</div></div>
+        </div>
+
+        {/* الرسوم البيانية */}
+        <div className="grid lg:grid-cols-2 gap-6 mb-8">
+          <div className="bg-white rounded-xl shadow-md p-4">
+            <h3 className="text-lg font-bold text-primary mb-4 text-center">📊 إحصائيات الحضور</h3>
+            <div className="h-64"><Pie data={attendanceData} options={chartOptions} /></div>
           </div>
-        ) : (
-          <div className="divide-y divide-gray-100">
-            {recentEvents.map((event) => (
-              <div key={event.id} className="p-6 hover:bg-gray-50 transition">
-                <div className="flex justify-between items-center flex-wrap gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3">
-                      {event.mediaUrl && (
-                        <img src={event.mediaUrl} alt={event.name} className="w-12 h-12 rounded-lg object-cover" />
-                      )}
-                      <div>
-                        <h3 className="font-semibold text-primary text-lg">{event.name}</h3>
-                        <p className="text-sm text-gray-500 mt-1">
-                          📅 {new Date(event.date).toLocaleDateString('ar-SA')}
-                        </p>
-                        <p className="text-xs text-gray-400 mt-1">📍 {event.location?.name}</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex gap-3">
-                    <Link to={`/events/${event.id}`} className="text-primary hover:underline text-sm">تفاصيل</Link>
-                    <Link to={`/events/${event.id}/guests`} className="text-primary hover:underline text-sm">إدارة الضيوف</Link>
-                    <button
-                      onClick={() => handleDeleteEvent(event.id, event.name)}
-                      className="text-red-500 hover:text-red-700 text-sm"
-                    >
-                      حذف
-                    </button>
+          <div className="bg-white rounded-xl shadow-md p-4">
+            <h3 className="text-lg font-bold text-primary mb-4 text-center">💬 تفاعل الضيوف مع الرسائل</h3>
+            <div className="h-64"><Pie data={messagesData} options={chartOptions} /></div>
+          </div>
+        </div>
+
+        {/* نسبة الحضور */}
+        <div className="grid sm:grid-cols-2 gap-6 mb-8">
+          <div className="bg-white rounded-xl shadow-md p-6">
+            <h3 className="text-lg font-bold text-primary mb-2">📈 نسبة تأكيد الحضور</h3>
+            <div className="text-4xl font-bold text-green-600">{stats?.confirmationRate || 0}%</div>
+            <div className="w-full bg-gray-200 rounded-full h-2 mt-2"><div className="bg-green-600 h-2 rounded-full" style={{ width: `${stats?.confirmationRate || 0}%` }}></div></div>
+          </div>
+          <div className="bg-white rounded-xl shadow-md p-6">
+            <h3 className="text-lg font-bold text-primary mb-2">🎯 نسبة الحضور الفعلي</h3>
+            <div className="text-4xl font-bold text-blue-500">{stats?.attendanceRate || 0}%</div>
+            <div className="w-full bg-gray-200 rounded-full h-2 mt-2"><div className="bg-blue-500 h-2 rounded-full" style={{ width: `${stats?.attendanceRate || 0}%` }}></div></div>
+          </div>
+        </div>
+
+        {/* أزرار سريعة */}
+        <div className="flex flex-wrap gap-3 mb-8">
+          <Link to="/create-event" className="bg-primary text-white px-5 py-2 rounded-lg hover:bg-primary-dark transition text-sm">+ مناسبة جديدة</Link>
+          <Link to="/analytics" className="bg-gray-200 text-primary px-5 py-2 rounded-lg hover:bg-gray-300 transition text-sm">📊 تحليلات متقدمة</Link>
+        </div>
+
+        {/* قائمة المناسبات */}
+        <div className="bg-white rounded-xl shadow-md overflow-hidden">
+          <div className="p-5 border-b"><h2 className="text-xl font-bold text-primary">مناسباتي</h2></div>
+          {events.length === 0 ? (
+            <div className="p-12 text-center text-gray-500">لا توجد مناسبات بعد</div>
+          ) : (
+            <div className="divide-y divide-gray-100">
+              {events.map((event) => (
+                <div key={event.id} className="p-5 hover:bg-gray-50 transition">
+                  <div className="flex justify-between items-center flex-wrap gap-3">
+                    <div><h3 className="font-semibold text-primary text-lg">{event.name}</h3><p className="text-sm text-gray-500">{new Date(event.date).toLocaleDateString('ar-SA')}</p></div>
+                    <div className="flex gap-2"><Link to={`/events/${event.id}`} className="text-primary hover:underline text-sm">تفاصيل</Link><Link to={`/events/${event.id}/guests`} className="text-primary hover:underline text-sm">ضيوف</Link></div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </div>
+
+        <button onClick={logout} className="mt-6 text-red-500 hover:text-red-700 text-sm">تسجيل الخروج</button>
       </div>
-    </Layout>
+      <Footer />
+    </div>
   );
 };
-
 export default Dashboard;

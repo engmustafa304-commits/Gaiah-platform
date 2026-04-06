@@ -1,62 +1,57 @@
-import React from 'react'
+import React from 'react';
 import { Link } from 'react-router-dom';
 
 const Hero = () => {
   return (
-    <section className="relative min-h-screen flex items-end overflow-hidden">
-
+    <section className="relative min-h-screen flex items-end overflow-hidden pt-20">
+      
       {/* الخلفية */}
       <div className="absolute inset-0 z-0">
-        <img 
-          src="/images/hero-bg.jpg" 
-          alt="Hero Background"
-          className="w-full h-full object-cover brightness-100 contrast-105"
-          style={{ objectPosition: 'center 30%' }}
-          onError={(e) => {
-            e.target.src = 'https://images.unsplash.com/photo-1519741497674-611481863552'
-          }}
-        />
+        <picture>
+          <source media="(max-width: 640px)" srcSet="/images/hero-mobile.jpg" />
+          <source media="(max-width: 1024px)" srcSet="/images/hero-tablet.jpg" />
+          <img src="/images/hero-desktop.jpg" alt="Hero Background" className="w-full h-full object-cover" />
+        </picture>
 
-        {/* Overlay قوي من جهة النص */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent"></div>
+        {/* gradient مناسب لليسار */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-transparent"></div>
       </div>
 
       {/* المحتوى */}
-      <div className="relative z-20 w-full px-6 sm:px-10 lg:px-16 pb-28 sm:pb-32 lg:pb-40">
+      <div className="relative z-10 w-full px-6 sm:px-10 lg:px-16 pb-16 md:pb-24">
+        
         <div className="flex justify-start items-end min-h-screen">
-
+          
           <div className="max-w-xl text-left text-white">
-
-            {/* العنوان */}
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight drop-shadow-2xl">
+            
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
               حوّل مناسبتك إلى{' '}
-              <span className="block text-[#3a7a7a] mt-2 drop-shadow-2xl">
+              <span className="block text-teal-light mt-2">
                 تجربة رقمية أنيقة
               </span>
             </h1>
 
-            {/* الوصف */}
-            <p className="text-base sm:text-lg md:text-xl text-gray-100 mb-6 leading-relaxed drop-shadow-md">
-              <span className="text-[#6a9a9a] font-semibold">
+            <p className="text-base sm:text-lg md:text-xl text-gray-200 mb-6 leading-relaxed">
+              <span className="text-teal-light font-semibold">
                 دعوات إلكترونية
               </span>{' '}
               بتصميم فاخر وتجربة سلسة لضيوفك
             </p>
 
-            {/* زر */}
-            <Link to="/login">
-              <button className="bg-white text-black px-8 py-3 rounded-full text-lg font-semibold hover:bg-gray-200 transition-all shadow-xl">
-                ابدأ الآن
-              </button>
+            <Link 
+              to="/register" 
+              className="inline-block bg-white text-primary px-6 py-3 rounded-full font-semibold hover:bg-gray-100 transition shadow-lg"
+            >
+              ابدأ الآن
             </Link>
 
           </div>
 
         </div>
+
       </div>
-
     </section>
-  )
-}
+  );
+};
 
-export default Hero
+export default Hero;

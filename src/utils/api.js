@@ -1,341 +1,329 @@
-// API Configuration - Mock Version مع تخزين منفصل لكل مناسبة
-const STORAGE_KEYS = {
-  EVENTS: 'gaiah_events',
-  USERS: 'gaiah_users',
-  CURRENT_USER: 'gaiah_current_user'
-};
+// Mock API - محاكاة كاملة للباكند
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-// Helper functions
-const getCurrentUser = () => {
-  const user = localStorage.getItem(STORAGE_KEYS.CURRENT_USER);
-  return user ? JSON.parse(user) : null;
-};
+let mockEvents = JSON.parse(localStorage.getItem('mock_events') || '[]');
+let mockUsers = JSON.parse(localStorage.getItem('mock_users') || '[]');
 
-const getEvents = () => {
-  const events = localStorage.getItem(STORAGE_KEYS.EVENTS);
-  return events ? JSON.parse(events) : [];
-};
-
-const saveEvents = (events) => {
-  localStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(events));
-};
-
-const getGuestsForEvent = (eventId) => {
-  const guests = localStorage.getItem(`gaiah_guests_${eventId}`);
-  return guests ? JSON.parse(guests) : [];
-};
-
-const saveGuestsForEvent = (eventId, guests) => {
-  localStorage.setItem(`gaiah_guests_${eventId}`, JSON.stringify(guests));
-};
-
-// Auth APIs
-export const authAPI = {
+const mockAPI = {
+  // ========== Auth APIs ==========
   register: async (userData) => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const users = JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS) || '[]');
-        const existingUser = users.find(u => u.email === userData.email);
-        if (existingUser) {
-          resolve({ success: false, error: 'البريد الإلكتروني موجود بالفعل' });
-          return;
-        }
-        
-        const newUser = {
-          uid: Date.now().toString(),
-          email: userData.email,
-          displayName: userData.displayName,
-          phone: userData.phone,
-          role: 'client',
-          subscription: {
-            plan: 'free',
-            totalInvitations: 1,        // دعوة تجريبية واحدة فقط
-            usedInvitations: 0,
-            remainingInvitations: 1,    // دعوة واحدة متبقية
-            expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-            status: 'active'
-          }
-        };
-        
-        users.push(newUser);
-        localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
-        localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(newUser));
-        
-        resolve({ success: true, token: 'mock_token', user: newUser });
-      }, 500);
-    });
+    await delay(500);
+    const existingUser = mockUsers.find(u => u.email === userData.email);
+    if (existingUser) throw new Error('البريد الإلكتروني موجود بالفعل');
+    const newUser = {
+      uid: Date.now().toString(),
+      email: userData.email,
+      displayName: userData.displayName,
+      phone: userData.phone,
+      role: 'client',
+      createdAt: new Date().toISOString()
+    };
+    mockUsers.push(newUser);
+    localStorage.setItem('mock_users', JSON.stringify(mockUsers));
+    localStorage.setItem('token', 'mock_token_' + Date.now());
+    localStorage.setItem('user', JSON.stringify(newUser));
+    return { token: localStorage.getItem('token'), user: newUser };
   },
-  
-  login: async (email, password) => {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        const users = JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS) || '[]');
-        const user = users.find(u => u.email === email);
-        if (!user) {
-          reject(new Error('البريد الإلكتروني أو كلمة المرور غير صحيحة'));
-          return;
-        }
-        localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(user));
-        resolve({ success: true, token: 'mock_token', user });
-      }, 500);
-    });
-  },
-  
-  getMe: () => {
-    const user = getCurrentUser();
-    return Promise.resolve({ success: true, user });
-  },
-  
-  logout: () => {
-    localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
-    return Promise.resolve({ success: true });
-  },
-  
-  updateProfile: (data) => {
-    const currentUser = getCurrentUser();
-    if (!currentUser) return Promise.resolve({ success: false, error: 'No user logged in' });
-    
-    const updatedUser = { ...currentUser, ...data };
-    localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(updatedUser));
-    
-    const users = JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS) || '[]');
-    const index = users.findIndex(u => u.uid === currentUser.uid);
-    if (index !== -1) users[index] = updatedUser;
-    localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
-    
-    return Promise.resolve({ success: true, user: updatedUser });
-  }
-};
 
-// Events APIs
-export const eventsAPI = {
-  getAll: async () => {
-    const currentUser = getCurrentUser();
-    if (!currentUser) return { success: true, events: [] };
-    
-    const allEvents = getEvents();
-    const userEvents = allEvents.filter(e => e.userId === currentUser.uid);
-    return { success: true, events: userEvents };
+  login: async (email, password) => {
+    await delay(500);
+    const user = mockUsers.find(u => u.email === email);
+    if (!user) throw new Error('البريد الإلكتروني أو كلمة المرور غير صحيحة');
+    localStorage.setItem('token', 'mock_token_' + Date.now());
+    localStorage.setItem('user', JSON.stringify(user));
+    return { token: localStorage.getItem('token'), user };
   },
-  
-  getById: async (id) => {
-    const allEvents = getEvents();
-    const event = allEvents.find(e => e.id === id);
-    if (event) {
-      return { success: true, event };
-    }
-    return { success: false, error: 'Event not found' };
+
+  getMe: async () => {
+    await delay(300);
+    const user = localStorage.getItem('user');
+    return { user: user ? JSON.parse(user) : null };
   },
-  
-  create: async (eventData) => {
-    const currentUser = getCurrentUser();
-    if (!currentUser) {
-      return { success: false, error: 'يجب تسجيل الدخول أولاً' };
-    }
-    
-    // التحقق من وجود دعوات متبقية
-    if (currentUser.subscription.remainingInvitations <= 0) {
-      return { 
-        success: false, 
-        error: '⚠️ انتهت الدعوات التجريبية. يرجى شراء باقة اشتراك للاستمرار',
-        needUpgrade: true 
-      };
-    }
-    
-    const allEvents = getEvents();
+
+  logout: async () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    return { success: true };
+  },
+
+  // ========== Events APIs ==========
+  getEvents: async () => {
+    await delay(300);
+    const currentUser = JSON.parse(localStorage.getItem('user'));
+    const userEvents = mockEvents.filter(e => e.userId === currentUser?.uid);
+    return { events: userEvents };
+  },
+
+  getEventById: async (id) => {
+    await delay(300);
+    const event = mockEvents.find(e => e.id === id);
+    return { event: event || null };
+  },
+
+  createEvent: async (eventData) => {
+    await delay(500);
+    const currentUser = JSON.parse(localStorage.getItem('user'));
     const newEvent = {
       id: Date.now().toString(),
-      ...eventData,
-      userId: currentUser.uid,
+      name: eventData.name,
+      date: eventData.date,
+      location: eventData.location,
+      description: eventData.description || '',
+      mediaUrl: eventData.mediaUrl || '',
+      mediaType: eventData.mediaType || 'image',
+      coordinates: eventData.coordinates || null,
+      userId: currentUser?.uid,
       uniqueLink: Math.random().toString(36).substring(2, 10),
       status: 'draft',
       totalGuests: 0,
       confirmedGuests: 0,
       declinedGuests: 0,
       attendedGuests: 0,
+      notAttendedGuests: 0,
+      readMessages: 0,
+      noResponseGuests: 0,
       createdAt: new Date().toISOString()
     };
-    
-    allEvents.push(newEvent);
-    saveEvents(allEvents);
-    
-    // تحديث عدد الدعوات المستخدمة
-    const updatedUser = {
-      ...currentUser,
-      subscription: {
-        ...currentUser.subscription,
-        usedInvitations: currentUser.subscription.usedInvitations + 1,
-        remainingInvitations: currentUser.subscription.remainingInvitations - 1
-      }
-    };
-    localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(updatedUser));
-    
-    // تحديث في قائمة المستخدمين
-    const users = JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS) || '[]');
-    const index = users.findIndex(u => u.uid === currentUser.uid);
-    if (index !== -1) users[index] = updatedUser;
-    localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
-    
+    mockEvents.push(newEvent);
+    localStorage.setItem('mock_events', JSON.stringify(mockEvents));
     return { success: true, eventId: newEvent.id };
   },
-  
-  update: async (id, data) => {
-    const allEvents = getEvents();
-    const index = allEvents.findIndex(e => e.id === id);
+
+  updateEvent: async (id, eventData) => {
+    await delay(300);
+    const index = mockEvents.findIndex(e => e.id === id);
     if (index !== -1) {
-      allEvents[index] = { ...allEvents[index], ...data, updatedAt: new Date().toISOString() };
-      saveEvents(allEvents);
+      mockEvents[index] = { ...mockEvents[index], ...eventData, updatedAt: new Date().toISOString() };
+      localStorage.setItem('mock_events', JSON.stringify(mockEvents));
       return { success: true };
     }
-    return { success: false, error: 'Event not found' };
+    return { success: false };
   },
-  
-  delete: async (id) => {
-    const allEvents = getEvents();
-    const filteredEvents = allEvents.filter(e => e.id !== id);
-    saveEvents(filteredEvents);
-    localStorage.removeItem(`gaiah_guests_${id}`);
+
+  deleteEvent: async (id) => {
+    await delay(300);
+    mockEvents = mockEvents.filter(e => e.id !== id);
+    localStorage.setItem('mock_events', JSON.stringify(mockEvents));
+    localStorage.removeItem(`guests_${id}`);
     return { success: true };
   },
-  
-  getStats: async (id) => {
-    const guests = getGuestsForEvent(id);
+
+  getEventStats: async (id) => {
+    await delay(300);
+    const event = mockEvents.find(e => e.id === id);
+    const guests = JSON.parse(localStorage.getItem(`guests_${id}`) || '[]');
+    const confirmed = guests.filter(g => g.status === 'confirmed').length;
+    const declined = guests.filter(g => g.status === 'declined').length;
+    const attended = guests.filter(g => g.status === 'attended').length;
+    const notAttended = guests.filter(g => g.status === 'not_attended').length;
+    const readMessages = guests.filter(g => g.readMessage === true).length;
+    const noResponse = guests.filter(g => g.status === 'pending').length;
+    
     return {
-      success: true,
       total: guests.length,
-      confirmed: guests.filter(g => g.status === 'confirmed').length,
-      declined: guests.filter(g => g.status === 'declined').length,
-      attended: guests.filter(g => g.status === 'attended').length
+      confirmed,
+      declined,
+      attended,
+      notAttended,
+      readMessages,
+      noResponse,
+      attendanceRate: guests.length > 0 ? ((attended / guests.length) * 100).toFixed(1) : 0,
+      confirmationRate: guests.length > 0 ? ((confirmed / guests.length) * 100).toFixed(1) : 0
     };
   },
-  
-  updateMedia: async (id, mediaData) => {
-    const allEvents = getEvents();
-    const index = allEvents.findIndex(e => e.id === id);
-    if (index !== -1) {
-      allEvents[index] = { ...allEvents[index], ...mediaData };
-      saveEvents(allEvents);
-      return { success: true };
-    }
-    return { success: false, error: 'Event not found' };
-  }
-};
 
-// Guests APIs
-export const guestsAPI = {
-  getByEvent: async (eventId) => {
-    const guests = getGuestsForEvent(eventId);
-    return { success: true, guests };
+  // ========== Guests APIs ==========
+  getGuests: async (eventId) => {
+    await delay(300);
+    const guests = JSON.parse(localStorage.getItem(`guests_${eventId}`) || '[]');
+    return { guests };
   },
-  
-  add: async (eventId, guestData) => {
-    const guests = getGuestsForEvent(eventId);
+
+  addGuest: async (eventId, guestData) => {
+    await delay(300);
+    const guests = JSON.parse(localStorage.getItem(`guests_${eventId}`) || '[]');
     const newGuest = {
       id: Date.now().toString(),
-      ...guestData,
+      name: guestData.name,
+      phone: guestData.phone,
+      email: guestData.email || '',
+      companions: guestData.companions || 0,
       eventId,
       status: 'pending',
+      readMessage: false,
       createdAt: new Date().toISOString()
     };
     guests.push(newGuest);
-    saveGuestsForEvent(eventId, guests);
+    localStorage.setItem(`guests_${eventId}`, JSON.stringify(guests));
     
-    const allEvents = getEvents();
-    const eventIndex = allEvents.findIndex(e => e.id === eventId);
+    const eventIndex = mockEvents.findIndex(e => e.id === eventId);
     if (eventIndex !== -1) {
-      allEvents[eventIndex].totalGuests = guests.length;
-      saveEvents(allEvents);
+      mockEvents[eventIndex].totalGuests = guests.length;
+      mockEvents[eventIndex].noResponseGuests = guests.filter(g => g.status === 'pending').length;
+      localStorage.setItem('mock_events', JSON.stringify(mockEvents));
     }
-    
     return { success: true, guestId: newGuest.id };
   },
-  
-  delete: async (guestId) => {
-    const allEvents = getEvents();
-    for (const event of allEvents) {
-      let guests = getGuestsForEvent(event.id);
-      const newGuests = guests.filter(g => g.id !== guestId);
-      if (newGuests.length !== guests.length) {
-        saveGuestsForEvent(event.id, newGuests);
-        event.totalGuests = newGuests.length;
-        saveEvents(allEvents);
+
+  updateGuestStatus: async (guestId, status) => {
+    await delay(300);
+    // البحث عن guest في جميع الأحداث
+    for (let i = 0; i < mockEvents.length; i++) {
+      const event = mockEvents[i];
+      let guests = JSON.parse(localStorage.getItem(`guests_${event.id}`) || '[]');
+      const guestIndex = guests.findIndex(g => g.id === guestId);
+      if (guestIndex !== -1) {
+        guests[guestIndex].status = status;
+        guests[guestIndex].updatedAt = new Date().toISOString();
+        localStorage.setItem(`guests_${event.id}`, JSON.stringify(guests));
+        
+        // تحديث إحصائيات الحدث
+        mockEvents[i].confirmedGuests = guests.filter(g => g.status === 'confirmed').length;
+        mockEvents[i].declinedGuests = guests.filter(g => g.status === 'declined').length;
+        mockEvents[i].attendedGuests = guests.filter(g => g.status === 'attended').length;
+        mockEvents[i].notAttendedGuests = guests.filter(g => g.status === 'not_attended').length;
+        mockEvents[i].noResponseGuests = guests.filter(g => g.status === 'pending').length;
+        localStorage.setItem('mock_events', JSON.stringify(mockEvents));
         break;
       }
     }
     return { success: true };
   },
-  
-  bulkImport: async (eventId, guestsList) => {
-    const existingGuests = getGuestsForEvent(eventId);
+
+  markMessageAsRead: async (guestId) => {
+    await delay(200);
+    for (let i = 0; i < mockEvents.length; i++) {
+      let guests = JSON.parse(localStorage.getItem(`guests_${mockEvents[i].id}`) || '[]');
+      const guestIndex = guests.findIndex(g => g.id === guestId);
+      if (guestIndex !== -1 && !guests[guestIndex].readMessage) {
+        guests[guestIndex].readMessage = true;
+        guests[guestIndex].readAt = new Date().toISOString();
+        localStorage.setItem(`guests_${mockEvents[i].id}`, JSON.stringify(guests));
+        mockEvents[i].readMessages = guests.filter(g => g.readMessage === true).length;
+        localStorage.setItem('mock_events', JSON.stringify(mockEvents));
+        break;
+      }
+    }
+    return { success: true };
+  },
+
+  deleteGuest: async (guestId) => {
+    await delay(300);
+    for (let i = 0; i < mockEvents.length; i++) {
+      const event = mockEvents[i];
+      let guests = JSON.parse(localStorage.getItem(`guests_${event.id}`) || '[]');
+      const newGuests = guests.filter(g => g.id !== guestId);
+      if (newGuests.length !== guests.length) {
+        localStorage.setItem(`guests_${event.id}`, JSON.stringify(newGuests));
+        mockEvents[i].totalGuests = newGuests.length;
+        mockEvents[i].confirmedGuests = newGuests.filter(g => g.status === 'confirmed').length;
+        mockEvents[i].declinedGuests = newGuests.filter(g => g.status === 'declined').length;
+        mockEvents[i].attendedGuests = newGuests.filter(g => g.status === 'attended').length;
+        mockEvents[i].noResponseGuests = newGuests.filter(g => g.status === 'pending').length;
+        localStorage.setItem('mock_events', JSON.stringify(mockEvents));
+        break;
+      }
+    }
+    return { success: true };
+  },
+
+  bulkImportGuests: async (eventId, guestsList) => {
+    await delay(1000);
+    const existingGuests = JSON.parse(localStorage.getItem(`guests_${eventId}`) || '[]');
     const newGuests = guestsList.map(g => ({
-      id: Date.now().toString(),
-      ...g,
+      id: Date.now().toString() + Math.random(),
+      name: g.name,
+      phone: g.phone,
+      email: g.email || '',
+      companions: parseInt(g.companions) || 0,
       eventId,
       status: 'pending',
+      readMessage: false,
       createdAt: new Date().toISOString()
     }));
     const allGuests = [...existingGuests, ...newGuests];
-    saveGuestsForEvent(eventId, allGuests);
+    localStorage.setItem(`guests_${eventId}`, JSON.stringify(allGuests));
     
-    const allEvents = getEvents();
-    const eventIndex = allEvents.findIndex(e => e.id === eventId);
+    const eventIndex = mockEvents.findIndex(e => e.id === eventId);
     if (eventIndex !== -1) {
-      allEvents[eventIndex].totalGuests = allGuests.length;
-      saveEvents(allEvents);
+      mockEvents[eventIndex].totalGuests = allGuests.length;
+      mockEvents[eventIndex].noResponseGuests = allGuests.filter(g => g.status === 'pending').length;
+      localStorage.setItem('mock_events', JSON.stringify(mockEvents));
     }
-    
     return { success: true, imported: newGuests.length };
-  }
-};
+  },
 
-// Dashboard APIs
-export const dashboardAPI = {
-  getStats: async () => {
-    const currentUser = getCurrentUser();
-    if (!currentUser) return { success: true, totalEvents: 0, totalGuests: 0, confirmationRate: 0 };
-    
-    const allEvents = getEvents();
-    const userEvents = allEvents.filter(e => e.userId === currentUser.uid);
-    
-    let totalGuests = 0;
-    let confirmedGuests = 0;
-    let attendedGuests = 0;
+  // ========== Dashboard APIs ==========
+  getDashboardStats: async () => {
+    await delay(300);
+    const currentUser = JSON.parse(localStorage.getItem('user'));
+    const userEvents = mockEvents.filter(e => e.userId === currentUser?.uid);
+    let totalGuests = 0, confirmedGuests = 0, declinedGuests = 0, attendedGuests = 0;
+    let notAttendedGuests = 0, readMessages = 0, noResponseGuests = 0;
     
     for (const event of userEvents) {
-      const guests = getGuestsForEvent(event.id);
+      const guests = JSON.parse(localStorage.getItem(`guests_${event.id}`) || '[]');
       totalGuests += guests.length;
       confirmedGuests += guests.filter(g => g.status === 'confirmed').length;
+      declinedGuests += guests.filter(g => g.status === 'declined').length;
       attendedGuests += guests.filter(g => g.status === 'attended').length;
+      notAttendedGuests += guests.filter(g => g.status === 'not_attended').length;
+      readMessages += guests.filter(g => g.readMessage === true).length;
+      noResponseGuests += guests.filter(g => g.status === 'pending').length;
     }
     
-    const confirmationRate = totalGuests > 0 ? ((confirmedGuests / totalGuests) * 100).toFixed(0) : 0;
-    
     return {
-      success: true,
       totalEvents: userEvents.length,
       totalGuests,
       confirmedGuests,
+      declinedGuests,
       attendedGuests,
-      confirmationRate
+      notAttendedGuests,
+      readMessages,
+      noResponseGuests,
+      attendanceRate: totalGuests > 0 ? ((attendedGuests / totalGuests) * 100).toFixed(1) : 0,
+      confirmationRate: totalGuests > 0 ? ((confirmedGuests / totalGuests) * 100).toFixed(1) : 0
     };
   },
-  
+
   getRecentEvents: async () => {
-    const currentUser = getCurrentUser();
-    if (!currentUser) return { success: true, events: [] };
-    
-    const allEvents = getEvents();
-    const userEvents = allEvents.filter(e => e.userId === currentUser.uid);
-    return { success: true, events: userEvents.slice(0, 5) };
+    await delay(300);
+    const currentUser = JSON.parse(localStorage.getItem('user'));
+    const userEvents = mockEvents.filter(e => e.userId === currentUser?.uid);
+    return { events: userEvents.slice(0, 5) };
   }
 };
 
-// Default export
-const API = {
-  auth: authAPI,
-  events: eventsAPI,
-  guests: guestsAPI,
-  dashboard: dashboardAPI,
+// تصدير واجهات API
+export const authAPI = {
+  register: (data) => mockAPI.register(data),
+  login: (email, password) => mockAPI.login(email, password),
+  getMe: () => mockAPI.getMe(),
+  logout: () => mockAPI.logout(),
 };
 
+export const eventsAPI = {
+  getAll: () => mockAPI.getEvents(),
+  getById: (id) => mockAPI.getEventById(id),
+  create: (data) => mockAPI.createEvent(data),
+  update: (id, data) => mockAPI.updateEvent(id, data),
+  delete: (id) => mockAPI.deleteEvent(id),
+  getStats: (id) => mockAPI.getEventStats(id),
+};
+
+export const guestsAPI = {
+  getByEvent: (eventId) => mockAPI.getGuests(eventId),
+  add: (eventId, data) => mockAPI.addGuest(eventId, data),
+  updateStatus: (guestId, status) => mockAPI.updateGuestStatus(guestId, status),
+  markAsRead: (guestId) => mockAPI.markMessageAsRead(guestId),
+  delete: (guestId) => mockAPI.deleteGuest(guestId),
+  bulkImport: (eventId, guestsList) => mockAPI.bulkImportGuests(eventId, guestsList),
+};
+
+export const dashboardAPI = {
+  getStats: () => mockAPI.getDashboardStats(),
+  getRecentEvents: () => mockAPI.getRecentEvents(),
+};
+
+const API = { auth: authAPI, events: eventsAPI, guests: guestsAPI, dashboard: dashboardAPI };
 export default API;
