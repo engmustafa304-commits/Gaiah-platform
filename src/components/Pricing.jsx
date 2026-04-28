@@ -3,6 +3,7 @@ import React from 'react'
 const Pricing = () => {
   const plans = [
     {
+      planId: "basic",
       name: "الباقة الأساسية",
       price: "350",
       period: "يبدأ من 50 ضيف",
@@ -11,6 +12,7 @@ const Pricing = () => {
       priceList: [{ guests: 50, price: 350 }, { guests: 100, price: 700 }, { guests: 150, price: 1050 }, { guests: 200, price: 1400 }, { guests: 300, price: 2100 }, { guests: 400, price: 2800 }, { guests: 500, price: 3500 }]
     },
     {
+      planId: "standard",
       name: "الباقة المتوسطة",
       price: "800",
       period: "يبدأ من 100 ضيف",
@@ -19,6 +21,7 @@ const Pricing = () => {
       priceList: [{ guests: 100, price: 800 }, { guests: 150, price: 1200 }, { guests: 200, price: 1600 }, { guests: 300, price: 2400 }, { guests: 400, price: 3200 }, { guests: 500, price: 4000 }]
     },
     {
+      planId: "premium",
       name: "الباقة الشاملة",
       price: "400",
       period: "يبدأ من 50 ضيف",
@@ -28,6 +31,7 @@ const Pricing = () => {
       priceList: [{ guests: 50, price: 400 }, { guests: 100, price: 800 }, { guests: 150, price: 1200 }, { guests: 200, price: 1600 }, { guests: 300, price: 2400 }, { guests: 400, price: 3200 }, { guests: 500, price: 4000 }]
     },
     {
+      planId: "vip",
       name: "باقة VIP",
       price: "2400",
       period: "يبدأ من 300 ضيف",
@@ -36,6 +40,7 @@ const Pricing = () => {
       priceList: [{ guests: 300, price: 2400 }, { guests: 400, price: 3200 }, { guests: 500, price: 4000 }]
     },
     {
+      planId: "enterprise",
       name: "باقة الشركات",
       price: "مخصص",
       period: "حسب الطلب",
@@ -140,7 +145,12 @@ const Pricing = () => {
               </div>
 
               <div className="p-5 pt-0">
-                <button className="w-full bg-gradient-to-r from-[#3a7a7a] to-[#004242] text-white py-2 rounded-lg font-semibold text-xs hover:opacity-90 transition">
+                <button
+                  onClick={() => {
+                    window.location.href = plan.custom ? '#exclusive' : `/onboarding/index.html?plan=${plan.planId}`;
+                  }}
+                  className="w-full bg-gradient-to-r from-[#3a7a7a] to-[#004242] text-white py-2 rounded-lg font-semibold text-xs hover:opacity-90 transition"
+                >
                   {plan.custom ? "اطلب عرضاً" : "اختر الباقة"}
                 </button>
               </div>

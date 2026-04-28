@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>بدء الاشتراك | جيّة</title>
+    <link rel="stylesheet" href="/shared/gaiah-ui.css" />
+    <link rel="stylesheet" href="./onboarding.css" />
+  </head>
+  <body>
+    <main class="page-shell onboarding-shell">
+      <div class="container onboarding-layout">
+        <section class="onboarding-copy">
+          <a class="back-home-link" href="/">العودة للصفحة الرئيسية</a>
+          <a class="brand-link" href="/">جيّة</a>
+          <p class="eyebrow">إعداد الحساب</p>
+          <h1>ابدأ طلب الاشتراك واختر عدد الضيوف المناسب</h1>
+        </section>
+
+        <section class="plan-selection-column">
+          <div class="card plan-summary" aria-live="polite">
+            <span class="summary-label">الباقة المختارة</span>
+            <strong id="selectedPlanName">جار تحميل الباقة...</strong>
+            <p id="selectedPlanDescription" class="muted"></p>
+            <ul id="selectedPlanFeatures" class="plan-features-list"></ul>
+            <div id="guestPriceOptions" class="guest-price-options"></div>
+            <div class="plan-price-box">
+              <span>السعر المختار</span>
+              <strong id="selectedPlanPrice">-</strong>
+            </div>
+          </div>
+        </section>
+
+        <section class="card onboarding-card">
+          <div class="tabs" role="tablist" aria-label="اختيار طريقة المتابعة">
+            <button class="tab-button active" type="button" data-tab="new-account">إنشاء حساب جديد</button>
+            <button class="tab-button" type="button" data-tab="existing-account">لدي حساب بالفعل</button>
+          </div>
+
+          <div id="formAlert" class="alert alert-info hidden"></div>
+
+          <div class="field guest-count-field visually-hidden">
+            <label for="guestCountSelect">عدد الضيوف</label>
+            <select id="guestCountSelect" name="selectedGuestCount" required></select>
+          </div>
+
+          <form id="newAccountForm" class="onboarding-form" data-flow="new-account">
+            <div class="form-grid">
+              <div class="field">
+                <label for="newFullName">الاسم الكامل</label>
+                <input id="newFullName" name="fullName" type="text" autocomplete="name" required />
+              </div>
+              <div class="field">
+                <label for="newWhatsapp">رقم الواتساب</label>
+                <input id="newWhatsapp" name="whatsapp" type="tel" inputmode="tel" placeholder="05xxxxxxxx" required />
+              </div>
+              <div class="field">
+                <label for="newHallName">اسم القاعة</label>
+                <input id="newHallName" name="hallName" type="text" required />
+              </div>
+              <div class="field">
+                <label for="newEmail">البريد الإلكتروني</label>
+                <input id="newEmail" name="email" type="email" autocomplete="email" required />
+              </div>
+              <div class="field">
+                <label for="newPassword">كلمة المرور</label>
+                <input id="newPassword" name="password" type="password" autocomplete="new-password" required />
+              </div>
+              <div class="field">
+                <label for="newConfirmPassword">تأكيد كلمة المرور</label>
+                <input id="newConfirmPassword" name="confirmPassword" type="password" autocomplete="new-password" required />
+              </div>
+            </div>
+
+            <button class="btn btn-gradient submit-button" type="submit">إرسال طلب الاشتراك</button>
+          </form>
+
+          <form id="existingAccountForm" class="onboarding-form hidden" data-flow="existing-account">
+            <div class="form-grid">
+              <div class="field">
+                <label for="existingEmail">البريد الإلكتروني</label>
+                <input id="existingEmail" name="email" type="email" autocomplete="email" required />
+              </div>
+              <div class="field">
+                <label for="existingPassword">كلمة المرور</label>
+                <input id="existingPassword" name="password" type="password" autocomplete="current-password" required />
+              </div>
+              <div class="field">
+                <label for="existingHallName">اسم القاعة</label>
+                <input id="existingHallName" name="hallName" type="text" required />
+              </div>
+              <div class="field">
+                <label for="existingWhatsapp">رقم الواتساب</label>
+                <input id="existingWhatsapp" name="whatsapp" type="tel" inputmode="tel" placeholder="05xxxxxxxx" required />
+              </div>
+            </div>
+
+            <button class="btn btn-gradient submit-button" type="submit">تسجيل الدخول وإرسال الطلب</button>
+          </form>
+        </section>
+      </div>
+    </main>
+
+    <script type="module" src="./onboarding.js"></script>
+  </body>
+</html>

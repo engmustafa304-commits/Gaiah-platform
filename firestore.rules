@@ -1,9 +1,52 @@
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    // للسماح بكل شيء مؤقتاً للتطوير
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isSelf(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function isSystemAdmin() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role == "system_admin"
+        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.status == "active";
+    }
+
+    match /users/{uid} {
+      allow read: if isSelf(uid) || isSystemAdmin();
+      allow create, update, delete: if false;
+    }
+
+    match /admins/{uid} {
+      allow get: if isSystemAdmin() || (
+        isSelf(uid)
+        && resource.data.role == "system_admin"
+        && resource.data.status == "active"
+      );
+      allow list: if isSystemAdmin();
+      allow create, update, delete: if false;
+    }
+
+    match /plan_subscription_requests/{requestId} {
+      allow read: if isSystemAdmin() || (
+        signedIn()
+        && resource.data.uid == request.auth.uid
+      );
+      allow create, update, delete: if false;
+    }
+
+    match /plans/{planId} {
+      allow read: if isSystemAdmin() || resource.data.isActive == true;
+      allow create, update, delete: if false;
+    }
+
     match /{document=**} {
-      allow read, write: if true;
+      allow read, write: if false;
     }
   }
 }

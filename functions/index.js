@@ -1,4 +1,5 @@
 const { onCall } = require("firebase-functions/v2/https");
+const { createPlanSubscriptionRequest } = require("./modules/planSubscriptions");
 
 exports.healthCheck = onCall(() => {
   return {
@@ -7,3 +8,5 @@ exports.healthCheck = onCall(() => {
     timestamp: new Date().toISOString(),
   };
 });
+
+exports.createPlanSubscriptionRequest = createPlanSubscriptionRequest;

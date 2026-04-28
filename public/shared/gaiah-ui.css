@@ -1,0 +1,230 @@
+@font-face {
+  font-family: "SAHazmVF";
+  src: url("/fonts/SAHazmVF.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --gaiah-primary: #212529;
+  --gaiah-dark: #343a40;
+  --gaiah-medium: #495057;
+  --gaiah-light: #6c757d;
+  --gaiah-teal: #3a7a7a;
+  --gaiah-deep-teal: #004242;
+  --gaiah-deep-teal-2: #1e5e5e;
+  --gaiah-soft-teal: #6a9a9a;
+  --gaiah-bg: #f9fafb;
+  --gaiah-border: #e5e7eb;
+  --gaiah-danger: #dc2626;
+  --gaiah-success: #16a34a;
+  --gaiah-warning: #d97706;
+  --gaiah-info: #2563eb;
+  --gaiah-shadow: 0 10px 25px rgba(33, 37, 41, 0.08);
+  --gaiah-shadow-lg: 0 20px 40px rgba(33, 37, 41, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100%;
+  margin: 0;
+  font-family: "SAHazmVF", "Cairo", Arial, sans-serif;
+  line-height: 1.6;
+  background: var(--gaiah-bg);
+  color: var(--gaiah-primary);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+a {
+  color: inherit;
+}
+
+.container {
+  width: min(1120px, calc(100% - 32px));
+  margin-inline: auto;
+}
+
+.page-shell {
+  min-height: 100vh;
+  padding: 32px 0;
+}
+
+.section {
+  padding: 48px 0;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid rgba(229, 231, 235, 0.8);
+  border-radius: 24px;
+  box-shadow: var(--gaiah-shadow);
+  transition: box-shadow 180ms ease, transform 180ms ease;
+}
+
+.card-hover:hover {
+  box-shadow: var(--gaiah-shadow-lg);
+  transform: translateY(-2px);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 10px 18px;
+  border: 0;
+  border-radius: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity 180ms ease, background 180ms ease, border 180ms ease, transform 180ms ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn:disabled,
+.is-loading {
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none;
+}
+
+.btn-primary {
+  background: var(--gaiah-primary);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: var(--gaiah-dark);
+}
+
+.btn-gradient {
+  background: linear-gradient(135deg, var(--gaiah-teal), var(--gaiah-deep-teal));
+  color: #fff;
+}
+
+.btn-secondary,
+.btn-outline {
+  background: #fff;
+  border: 1px solid var(--gaiah-border);
+  color: var(--gaiah-primary);
+}
+
+.btn-outline:hover {
+  border-color: var(--gaiah-deep-teal);
+  color: var(--gaiah-deep-teal);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field label {
+  color: var(--gaiah-primary);
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.input,
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 16px;
+  border: 1px solid var(--gaiah-border);
+  border-radius: 14px;
+  background: #fff;
+  color: var(--gaiah-primary);
+  outline: none;
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.input:focus,
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  border-color: var(--gaiah-deep-teal);
+  box-shadow: 0 0 0 3px rgba(58, 122, 122, 0.14);
+}
+
+.alert {
+  padding: 12px 14px;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  font-size: 0.94rem;
+}
+
+.alert-success {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+  color: var(--gaiah-success);
+}
+
+.alert-error {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: var(--gaiah-danger);
+}
+
+.alert-warning {
+  background: #fffbeb;
+  border-color: #fde68a;
+  color: var(--gaiah-warning);
+}
+
+.alert-info {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: var(--gaiah-info);
+}
+
+.hidden {
+  display: none !important;
+}
+
+.muted {
+  color: var(--gaiah-light);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, var(--gaiah-teal), var(--gaiah-deep-teal));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@media (max-width: 760px) {
+  .page-shell {
+    padding: 18px 0;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
