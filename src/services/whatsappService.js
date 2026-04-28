@@ -1,36 +1,16 @@
-import axios from 'axios';
-
 class WhatsAppService {
   constructor() {
-    this.phoneNumberId = import.meta.env.VITE_WHATSAPP_PHONE_NUMBER_ID;
-    this.accessToken = import.meta.env.VITE_WHATSAPP_ACCESS_TOKEN;
-    this.baseUrl = 'https://graph.facebook.com/v18.0';
+    this.notConfiguredMessage = 'WhatsApp backend is not configured yet. This will be handled by Firebase Cloud Functions.';
   }
 
   // إرسال رسالة نصية
   async sendTextMessage(to, message) {
-    try {
-      const response = await axios.post(
-        `${this.baseUrl}/${this.phoneNumberId}/messages`,
-        {
-          messaging_product: 'whatsapp',
-          recipient_type: 'individual',
-          to: to,
-          type: 'text',
-          text: { body: message }
-        },
-        {
-          headers: {
-            'Authorization': `Bearer ${this.accessToken}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-      return { success: true, data: response.data };
-    } catch (error) {
-      console.error('WhatsApp API Error:', error.response?.data || error.message);
-      return { success: false, error: error.response?.data || error.message };
-    }
+    return {
+      success: false,
+      error: this.notConfiguredMessage,
+      to,
+      message
+    };
   }
 
   // إرسال دعوة مناسبة
