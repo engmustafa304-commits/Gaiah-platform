@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>إنشاء حساب | جيّة</title>
+    <link rel="stylesheet" href="/shared/gaiah-ui.css" />
+    <link rel="stylesheet" href="./register.css" />
+  </head>
+  <body>
+    <main class="auth-shell">
+      <section class="auth-card card">
+        <a class="back-link" href="/">العودة للصفحة الرئيسية</a>
+        <a class="brand-link" href="/">جيّة</a>
+        <div class="auth-heading">
+          <h1>إنشاء حساب</h1>
+          <p>أنشئ حسابك الآن ويمكنك اختيار الباقة المناسبة لاحقاً.</p>
+        </div>
+
+        <div id="registerAlert" class="alert alert-info hidden"></div>
+
+        <form id="registerForm" class="auth-form">
+          <label>
+            <span>الاسم الكامل</span>
+            <input id="registerFullName" name="fullName" type="text" autocomplete="name" required />
+          </label>
+          <label>
+            <span>البريد الإلكتروني</span>
+            <input id="registerEmail" name="email" type="email" autocomplete="email" required />
+          </label>
+          <div class="form-grid">
+            <label>
+              <span>كلمة المرور</span>
+              <input id="registerPassword" name="password" type="password" autocomplete="new-password" required />
+            </label>
+            <label>
+              <span>تأكيد كلمة المرور</span>
+              <input id="registerConfirmPassword" name="confirmPassword" type="password" autocomplete="new-password" required />
+            </label>
+          </div>
+          <div class="form-grid">
+            <label>
+              <span>رقم الواتساب</span>
+              <input id="registerWhatsapp" name="whatsapp" type="tel" inputmode="tel" placeholder="05xxxxxxxx" />
+            </label>
+            <label>
+              <span>اسم القاعة</span>
+              <input id="registerHallName" name="hallName" type="text" />
+            </label>
+          </div>
+          <button class="btn btn-gradient submit-button" type="submit">إنشاء الحساب</button>
+        </form>
+
+        <div class="auth-links">
+          <a href="/login/index.html">لديك حساب بالفعل؟ تسجيل الدخول</a>
+          <a href="/">اختيار باقة الآن</a>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="./register.js"></script>
+  </body>
+</html>

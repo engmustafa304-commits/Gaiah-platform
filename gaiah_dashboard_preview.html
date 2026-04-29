@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>جيّة | Dashboard Preview</title>
+  <style>
+    :root {
+      --primary: #004242;
+      --primary-dark: #003333;
+      --primary-light: #5c7f7f;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --border: #eef2f7;
+      --muted: #64748b;
+      --shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+      --soft-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--primary);
+      font-family: "Cairo", "Tahoma", "Segoe UI", sans-serif;
+      line-height: 1.6;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button, input, textarea, select { font: inherit; }
+    button { cursor: pointer; border: 0; }
+
+    .app-shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 280px 1fr;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      background: linear-gradient(180deg, var(--primary), #002d2d);
+      color: white;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      overflow-y: auto;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .brand-mark {
+      width: 46px;
+      height: 46px;
+      border-radius: 15px;
+      background: linear-gradient(135deg, #ffffff, #d9fffb);
+      color: var(--primary);
+      display: grid;
+      place-items: center;
+      font-size: 24px;
+      box-shadow: 0 12px 24px rgba(0,0,0,0.18);
+    }
+
+    .brand-title { font-size: 22px; font-weight: 900; }
+    .brand-subtitle { color: rgba(255,255,255,0.72); font-size: 12px; }
+
+    .nav-section-title {
+      font-size: 12px;
+      color: rgba(255,255,255,0.55);
+      margin: 6px 6px 4px;
+    }
+
+    .nav-list { display: grid; gap: 8px; }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      color: rgba(255,255,255,0.82);
+      transition: 0.18s ease;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      background: rgba(255,255,255,0.12);
+      color: white;
+      transform: translateX(-2px);
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding-top: 18px;
+      border-top: 1px solid rgba(255,255,255,0.12);
+      display: grid;
+      gap: 10px;
+    }
+
+    .user-chip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255,255,255,0.1);
+      padding: 12px;
+      border-radius: 16px;
+    }
+
+    .avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: white;
+      color: var(--primary);
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+    }
+
+    .main {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(248,250,252,0.86);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .mobile-menu { display: none; }
+
+    .topbar-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .page {
+      padding: 30px;
+      width: 100%;
+      max-width: 1320px;
+      margin: 0 auto;
+    }
+
+    .page-header {
+      margin-bottom: 28px;
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { font-size: 30px; line-height: 1.3; margin-bottom: 6px; }
+    h2 { font-size: 22px; }
+    h3 { font-size: 18px; }
+    .muted { color: var(--primary-light); }
+    .small { font-size: 13px; }
+
+    .grid { display: grid; gap: 22px; }
+    .stats-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); margin-bottom: 28px; }
+    .details-grid { grid-template-columns: minmax(0, 2fr) minmax(300px, 1fr); align-items: start; }
+    .two-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .three-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--soft-shadow);
+      overflow: hidden;
+    }
+
+    .card-body { padding: 24px; }
+    .card-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+
+    .stat-card {
+      padding: 23px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      transition: 0.18s ease;
+    }
+
+    .stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+    .stat-title { color: var(--primary-light); font-size: 14px; margin-bottom: 8px; }
+    .stat-value { font-size: 34px; font-weight: 900; color: var(--primary); line-height: 1; }
+    .stat-icon {
+      width: 54px; height: 54px; border-radius: 16px;
+      display: grid; place-items: center;
+      color: white; font-size: 25px; flex: 0 0 auto;
+    }
+    .blue { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+    .green { background: linear-gradient(135deg, #22c55e, #16a34a); }
+    .purple { background: linear-gradient(135deg, #a855f7, #7c3aed); }
+    .orange { background: linear-gradient(135deg, #f97316, #ea580c); }
+
+    .actions-row { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 28px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border-radius: 12px;
+      padding: 11px 18px;
+      min-height: 44px;
+      font-weight: 800;
+      transition: 0.18s ease;
+      white-space: nowrap;
+    }
+
+    .btn-primary { background: var(--primary); color: white; box-shadow: 0 10px 20px rgba(0,66,66,0.18); }
+    .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+    .btn-soft { background: #eef4f4; color: var(--primary); }
+    .btn-soft:hover { background: #e2eded; }
+    .btn-danger { background: #ef4444; color: white; }
+    .btn-danger:hover { background: #dc2626; }
+    .btn-warn { background: #f59e0b; color: white; }
+    .btn-outline { background: white; color: var(--primary); border: 1px solid #d8e3e3; }
+    .btn-outline:hover { background: #f8fbfb; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .link-button {
+      background: transparent;
+      color: var(--primary);
+      padding: 0;
+      font-weight: 800;
+      text-decoration: underline;
+    }
+
+    .event-list { display: grid; }
+    .event-row {
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      border-top: 1px solid var(--border);
+      transition: 0.18s ease;
+    }
+    .event-row:first-child { border-top: 0; }
+    .event-row:hover { background: #f8fbfb; }
+    .event-main { display: flex; align-items: center; gap: 13px; min-width: 0; }
+    .thumb {
+      width: 52px; height: 52px; border-radius: 14px; object-fit: cover; flex: 0 0 auto;
+      background: linear-gradient(135deg, #e2eeee, #f8fafc);
+      display: grid; place-items: center; font-size: 23px;
+    }
+    .event-title { font-weight: 900; font-size: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 420px; }
+    .event-meta { color: #64748b; font-size: 13px; display: flex; gap: 10px; flex-wrap: wrap; margin-top: 2px; }
+    .row-actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    .row-actions button, .row-actions a { font-weight: 800; color: var(--primary); background: transparent; padding: 4px; }
+    .row-actions .danger-text { color: #ef4444; }
+
+    .empty-state { padding: 54px 20px; text-align: center; color: #64748b; }
+    .empty-icon { font-size: 54px; margin-bottom: 12px; }
+
+    .form-card { max-width: 860px; margin-inline: auto; }
+    .form-grid { display: grid; gap: 22px; }
+    label.field-label { display: block; font-weight: 900; margin-bottom: 9px; color: var(--primary); }
+
+    input[type="text"], input[type="email"], input[type="date"], textarea, select {
+      width: 100%;
+      border: 1px solid #d9e4e4;
+      border-radius: 13px;
+      padding: 12px 14px;
+      color: var(--primary);
+      background: white;
+      outline: none;
+      transition: 0.15s ease;
+    }
+
+    textarea { min-height: 118px; resize: vertical; }
+    input:focus, textarea:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(0,66,66,0.08); }
+
+    .radio-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .radio-card {
+      border: 1px solid #d9e4e4;
+      border-radius: 13px;
+      padding: 12px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      background: white;
+    }
+
+    .drop-zone {
+      border: 2px dashed #cbd5e1;
+      border-radius: 16px;
+      padding: 28px;
+      text-align: center;
+      transition: 0.18s ease;
+      background: #fbfdfd;
+    }
+    .drop-zone:hover { border-color: var(--primary); background: #f7fbfb; }
+    .drop-zone img, .drop-zone video { max-height: 220px; max-width: 100%; border-radius: 14px; object-fit: contain; }
+
+    .map-placeholder {
+      position: relative;
+      min-height: 240px;
+      border: 1px solid #d9e4e4;
+      border-radius: 18px;
+      overflow: hidden;
+      background:
+        linear-gradient(135deg, rgba(0,66,66,0.18), rgba(0,66,66,0.02)),
+        radial-gradient(circle at 20% 30%, #dff2f2 0 7%, transparent 8%),
+        radial-gradient(circle at 74% 55%, #cce8e8 0 10%, transparent 11%),
+        linear-gradient(90deg, #f8fafc 24%, transparent 24% 26%, #f8fafc 26% 49%, transparent 49% 51%, #f8fafc 51% 74%, transparent 74% 76%, #f8fafc 76%),
+        linear-gradient(0deg, transparent 24%, #e2eeee 24% 26%, transparent 26% 49%, #e2eeee 49% 51%, transparent 51% 74%, #e2eeee 74% 76%, transparent 76%);
+    }
+
+    .map-pin {
+      position: absolute;
+      top: 43%; left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 44px;
+      filter: drop-shadow(0 10px 18px rgba(0,0,0,0.25));
+    }
+
+    .map-controls {
+      position: absolute;
+      bottom: 14px;
+      right: 14px;
+      left: 14px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .alert {
+      padding: 12px 14px;
+      border-radius: 13px;
+      font-size: 14px;
+      border: 1px solid transparent;
+      margin-top: 10px;
+    }
+    .alert-warning { background: #fffbeb; color: #92400e; border-color: #fde68a; }
+    .alert-success { background: #ecfdf5; color: #047857; border-color: #a7f3d0; }
+    .alert-info { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
+
+    .media-frame {
+      min-height: 320px;
+      background: #f1f5f9;
+      display: grid;
+      place-items: center;
+      position: relative;
+    }
+    .media-frame img, .media-frame video { width: 100%; max-height: 520px; object-fit: contain; display: block; }
+    .floating-edit { position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.92); color: var(--primary); padding: 9px 13px; border-radius: 11px; box-shadow: var(--soft-shadow); }
+    .info-row { display: flex; gap: 12px; padding: 8px 0; align-items: flex-start; }
+    .info-label { color: var(--primary-light); width: 92px; flex: 0 0 auto; }
+
+    .quick-stat {
+      text-align: center;
+      padding: 14px;
+      border-radius: 14px;
+      background: #f8fbfb;
+    }
+    .quick-stat-value { font-weight: 900; font-size: 28px; line-height: 1; }
+    .green-text { color: #22c55e; }
+    .red-text { color: #ef4444; }
+    .blue-text { color: #2563eb; }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-backdrop.show { display: flex; }
+    .modal { background: white; width: min(520px, 100%); border-radius: 22px; box-shadow: 0 24px 70px rgba(0,0,0,0.25); padding: 24px; }
+
+    .toast {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 200;
+      min-width: 260px;
+      max-width: 360px;
+      background: white;
+      border: 1px solid var(--border);
+      border-right: 5px solid var(--primary);
+      border-radius: 14px;
+      padding: 14px 16px;
+      box-shadow: var(--shadow);
+      display: none;
+      color: var(--primary);
+      font-weight: 800;
+    }
+    .toast.show { display: block; animation: slideIn 0.18s ease; }
+    .toast.error { border-right-color: #ef4444; }
+    .toast.success { border-right-color: #22c55e; }
+    @keyframes slideIn { from { transform: translateX(-12px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+    .subscription-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: #eef4f4;
+      color: var(--primary);
+      font-weight: 900;
+      font-size: 13px;
+    }
+
+    .desktop-hidden { display: none; }
+
+    @media (max-width: 1100px) {
+      .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .details-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 820px) {
+      .app-shell { grid-template-columns: 1fr; }
+      .sidebar {
+        position: fixed;
+        inset: 0 auto 0 0;
+        width: min(320px, 88vw);
+        z-index: 80;
+        transform: translateX(-105%);
+        transition: transform 0.2s ease;
+      }
+      .sidebar.open { transform: translateX(0); }
+      .mobile-menu { display: inline-flex; }
+      .page { padding: 22px 16px; }
+      .topbar { padding: 14px 16px; }
+      .stats-grid, .two-grid, .three-grid { grid-template-columns: 1fr; }
+      .event-row { align-items: flex-start; flex-direction: column; }
+      .event-title { max-width: 78vw; }
+      .map-controls { grid-template-columns: 1fr; }
+      .desktop-hidden { display: inline-flex; }
+    }
+
+    @media (max-width: 520px) {
+      h1 { font-size: 25px; }
+      .stat-card { padding: 18px; }
+      .stat-value { font-size: 29px; }
+      .radio-grid { grid-template-columns: 1fr; }
+      .actions-row .btn { width: 100%; }
+      .topbar-actions { justify-content: flex-end; }
+    }
+  </style>
+</head>
+<body>
+  <div id="toast" class="toast"></div>
+
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-mark">💌</div>
+        <div>
+          <div class="brand-title">جيّة</div>
+          <div class="brand-subtitle">منصة إدارة الدعوات الرقمية</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="nav-section-title">القائمة</div>
+        <nav class="nav-list">
+          <a class="nav-link" data-route="dashboard" href="#/dashboard"><span>🏠</span> لوحة التحكم</a>
+          <a class="nav-link" data-route="create-event" href="#/create-event"><span>➕</span> إنشاء مناسبة</a>
+          <a class="nav-link" data-route="analytics" href="#/analytics"><span>📊</span> التحليلات</a>
+          <a class="nav-link" data-route="subscription" href="#/subscription"><span>💳</span> الاشتراك</a>
+        </nav>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="user-chip" id="sidebarUser"></div>
+        <button class="btn btn-outline" id="resetDemoBtn" type="button">إعادة ضبط بيانات العرض</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="btn btn-soft mobile-menu" id="openMenuBtn" type="button">☰ القائمة</button>
+        <div>
+          <strong id="topbarTitle">لوحة التحكم</strong>
+          <div class="small muted">نسخة HTML/JS/CSS مستقلة للمعاينة</div>
+        </div>
+        <div class="topbar-actions">
+          <span class="subscription-pill" id="invitePill">📨 0 دعوات متبقية</span>
+          <a class="btn btn-primary" href="#/create-event">+ مناسبة جديدة</a>
+        </div>
+      </header>
+
+      <section class="page" id="app"></section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="mediaModal"></div>
+
+  <script>
+    /**********************************************************************
+     * Standalone preview converted from the uploaded React pages:
+     * Dashboard.jsx, EventDetails.jsx, CreateEvent.jsx, index.css, api.js
+     * No React, no build step, no external libraries.
+     **********************************************************************/
+
+    const STORAGE_KEYS = {
+      EVENTS: 'gaiah_events',
+      USERS: 'gaiah_users',
+      CURRENT_USER: 'gaiah_current_user'
+    };
+
+    const $ = (selector, root = document) => root.querySelector(selector);
+    const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+
+    const sampleMediaSvg = encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" width="1000" height="620" viewBox="0 0 1000 620">
+        <defs>
+          <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+            <stop stop-color="#004242" offset="0" />
+            <stop stop-color="#3a7a7a" offset="1" />
+          </linearGradient>
+          <filter id="s"><feDropShadow dx="0" dy="16" stdDeviation="18" flood-opacity="0.25"/></filter>
+        </defs>
+        <rect width="1000" height="620" fill="url(#g)" />
+        <circle cx="150" cy="120" r="120" fill="#ffffff" opacity="0.08"/>
+        <circle cx="860" cy="520" r="180" fill="#ffffff" opacity="0.08"/>
+        <g filter="url(#s)">
+          <rect x="175" y="110" width="650" height="400" rx="36" fill="#fff" opacity="0.94"/>
+          <text x="500" y="250" font-size="64" text-anchor="middle" fill="#004242" font-family="Arial" font-weight="800">دعوة مناسبة</text>
+          <text x="500" y="330" font-size="34" text-anchor="middle" fill="#3a7a7a" font-family="Arial">تصميم تجريبي للمعاينة</text>
+          <text x="500" y="405" font-size="74" text-anchor="middle">💌</text>
+        </g>
+      </svg>
+    `);
+
+    function getCurrentUser() {
+      const user = localStorage.getItem(STORAGE_KEYS.CURRENT_USER);
+      return user ? JSON.parse(user) : null;
+    }
+
+    function setCurrentUser(user) {
+      localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(user));
+      const users = JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS) || '[]');
+      const idx = users.findIndex((u) => u.uid === user.uid);
+      if (idx >= 0) users[idx] = user; else users.push(user);
+      localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+    }
+
+    function getEvents() {
+      return JSON.parse(localStorage.getItem(STORAGE_KEYS.EVENTS) || '[]');
+    }
+
+    function saveEvents(events) {
+      localStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(events));
+    }
+
+    function getGuestsForEvent(eventId) {
+      return JSON.parse(localStorage.getItem(`gaiah_guests_${eventId}`) || '[]');
+    }
+
+    function saveGuestsForEvent(eventId, guests) {
+      localStorage.setItem(`gaiah_guests_${eventId}`, JSON.stringify(guests));
+    }
+
+    function seedDemoData(force = false) {
+      if (!force && getCurrentUser()) return;
+
+      const user = {
+        uid: 'demo-user-1',
+        email: 'demo@gaiah.local',
+        displayName: 'أحمد عبدالله',
+        phone: '+971500000000',
+        role: 'client',
+        subscription: {
+          plan: 'free',
+          totalInvitations: 5,
+          usedInvitations: 2,
+          remainingInvitations: 3,
+          expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+          status: 'active'
+        }
+      };
+
+      const events = [
+        {
+          id: 'evt-001',
+          name: 'حفل زفاف أحمد وسارة',
+          date: '2026-05-18',
+          location: {
+            name: 'قاعة اللؤلؤة',
+            address: 'دبي، شارع الشيخ زايد، بالقرب من المركز التجاري',
+            coordinates: { lat: 25.2048, lng: 55.2708 }
+          },
+          description: 'حفل عائلي مسائي مع استقبال الضيوف من الساعة 7 مساءً.',
+          mediaUrl: `data:image/svg+xml;charset=utf-8,${sampleMediaSvg}`,
+          mediaType: 'image',
+          userId: user.uid,
+          uniqueLink: 'ahmed-sara',
+          status: 'draft',
+          totalGuests: 4,
+          confirmedGuests: 2,
+          declinedGuests: 1,
+          attendedGuests: 1,
+          createdAt: new Date().toISOString()
+        },
+        {
+          id: 'evt-002',
+          name: 'اجتماع عائلي خاص',
+          date: '2026-06-02',
+          location: {
+            name: 'منزل العائلة',
+            address: 'جميرا، دبي',
+            coordinates: { lat: 25.216, lng: 55.253 }
+          },
+          description: 'تجمع بسيط للعائلة والأصدقاء المقربين.',
+          mediaUrl: '',
+          mediaType: 'none',
+          userId: user.uid,
+          uniqueLink: 'family-2026',
+          status: 'draft',
+          totalGuests: 3,
+          confirmedGuests: 1,
+          declinedGuests: 0,
+          attendedGuests: 0,
+          createdAt: new Date().toISOString()
+        }
+      ];
+
+      setCurrentUser(user);
+      saveEvents(events);
+      saveGuestsForEvent('evt-001', [
+        { id: 'g1', name: 'محمد علي', phone: '+971501111111', status: 'confirmed' },
+        { id: 'g2', name: 'سارة حسن', phone: '+971502222222', status: 'confirmed' },
+        { id: 'g3', name: 'خالد عمر', phone: '+971503333333', status: 'declined' },
+        { id: 'g4', name: 'مريم يوسف', phone: '+971504444444', status: 'attended' }
+      ]);
+      saveGuestsForEvent('evt-002', [
+        { id: 'g5', name: 'ناصر أحمد', phone: '+971505555555', status: 'pending' },
+        { id: 'g6', name: 'ريم سعيد', phone: '+971506666666', status: 'confirmed' },
+        { id: 'g7', name: 'فاطمة صالح', phone: '+971507777777', status: 'pending' }
+      ]);
+    }
+
+    const API = {
+      events: {
+        getAll: async () => {
+          const currentUser = getCurrentUser();
+          if (!currentUser) return { success: true, events: [] };
+          return { success: true, events: getEvents().filter((e) => e.userId === currentUser.uid) };
+        },
+        getById: async (id) => {
+          const event = getEvents().find((e) => e.id === id);
+          return event ? { success: true, event } : { success: false, error: 'Event not found' };
+        },
+        create: async (eventData) => {
+          const currentUser = getCurrentUser();
+          if (!currentUser) return { success: false, error: 'يجب تسجيل الدخول أولاً' };
+          if ((currentUser.subscription?.remainingInvitations || 0) <= 0) {
+            return { success: false, needUpgrade: true, error: '⚠️ انتهت الدعوات التجريبية. يرجى شراء باقة اشتراك للاستمرار' };
+          }
+
+          const allEvents = getEvents();
+          const newEvent = {
+            id: `evt-${Date.now()}`,
+            ...eventData,
+            userId: currentUser.uid,
+            uniqueLink: Math.random().toString(36).substring(2, 10),
+            status: 'draft',
+            totalGuests: 0,
+            confirmedGuests: 0,
+            declinedGuests: 0,
+            attendedGuests: 0,
+            createdAt: new Date().toISOString()
+          };
+          allEvents.unshift(newEvent);
+          saveEvents(allEvents);
+
+          const updatedUser = {
+            ...currentUser,
+            subscription: {
+              ...currentUser.subscription,
+              usedInvitations: (currentUser.subscription?.usedInvitations || 0) + 1,
+              remainingInvitations: Math.max(0, (currentUser.subscription?.remainingInvitations || 0) - 1)
+            }
+          };
+          setCurrentUser(updatedUser);
+          return { success: true, eventId: newEvent.id };
+        },
+        delete: async (id) => {
+          saveEvents(getEvents().filter((e) => e.id !== id));
+          localStorage.removeItem(`gaiah_guests_${id}`);
+          return { success: true };
+        },
+        getStats: async (id) => {
+          const guests = getGuestsForEvent(id);
+          return {
+            success: true,
+            total: guests.length,
+            confirmed: guests.filter((g) => g.status === 'confirmed').length,
+            declined: guests.filter((g) => g.status === 'declined').length,
+            attended: guests.filter((g) => g.status === 'attended').length
+          };
+        },
+        updateMedia: async (id, mediaData) => {
+          const allEvents = getEvents();
+          const idx = allEvents.findIndex((e) => e.id === id);
+          if (idx < 0) return { success: false, error: 'Event not found' };
+          allEvents[idx] = { ...allEvents[idx], ...mediaData, updatedAt: new Date().toISOString() };
+          saveEvents(allEvents);
+          return { success: true };
+        }
+      },
+      dashboard: {
+        getStats: async () => {
+          const currentUser = getCurrentUser();
+          if (!currentUser) return { success: true, totalEvents: 0, totalGuests: 0, confirmationRate: 0 };
+          const userEvents = getEvents().filter((e) => e.userId === currentUser.uid);
+          let totalGuests = 0;
+          let confirmedGuests = 0;
+          let attendedGuests = 0;
+          userEvents.forEach((event) => {
+            const guests = getGuestsForEvent(event.id);
+            totalGuests += guests.length;
+            confirmedGuests += guests.filter((g) => g.status === 'confirmed').length;
+            attendedGuests += guests.filter((g) => g.status === 'attended').length;
+          });
+          return {
+            success: true,
+            totalEvents: userEvents.length,
+            totalGuests,
+            confirmedGuests,
+            attendedGuests,
+            confirmationRate: totalGuests > 0 ? Math.round((confirmedGuests / totalGuests) * 100) : 0
+          };
+        },
+        getRecentEvents: async () => {
+          const currentUser = getCurrentUser();
+          if (!currentUser) return { success: true, events: [] };
+          const events = getEvents().filter((e) => e.userId === currentUser.uid);
+          return { success: true, events: events.slice(0, 5) };
+        }
+      }
+    };
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function formatDate(dateValue) {
+      if (!dateValue) return 'غير محدد';
+      return new Date(dateValue).toLocaleDateString('ar-SA');
+    }
+
+    function showToast(message, type = 'success') {
+      const toast = $('#toast');
+      toast.className = `toast show ${type}`;
+      toast.textContent = message;
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => toast.className = 'toast', 2600);
+    }
+
+    function setActiveNav(routeName) {
+      $$('.nav-link').forEach((link) => link.classList.toggle('active', link.dataset.route === routeName));
+      const titleMap = {
+        'dashboard': 'لوحة التحكم',
+        'create-event': 'إنشاء مناسبة جديدة',
+        'analytics': 'التحليلات',
+        'subscription': 'الاشتراك',
+        'event-details': 'تفاصيل المناسبة',
+        'guests': 'إدارة الضيوف'
+      };
+      $('#topbarTitle').textContent = titleMap[routeName] || 'لوحة التحكم';
+      updateShellUser();
+    }
+
+    function updateShellUser() {
+      const user = getCurrentUser();
+      const remaining = user?.subscription?.remainingInvitations ?? 0;
+      $('#invitePill').textContent = `📨 ${remaining} دعوات متبقية`;
+      $('#sidebarUser').innerHTML = `
+        <div class="avatar">${escapeHtml((user?.displayName || 'م')[0])}</div>
+        <div>
+          <div style="font-weight:900">${escapeHtml(user?.displayName || 'مستخدم')}</div>
+          <div class="small" style="color:rgba(255,255,255,.68)">${escapeHtml(user?.email || 'demo@gaiah.local')}</div>
+        </div>
+      `;
+    }
+
+    function mediaThumb(event) {
+      if (event.mediaUrl && event.mediaType === 'image') {
+        return `<img class="thumb" src="${event.mediaUrl}" alt="${escapeHtml(event.name)}" />`;
+      }
+      if (event.mediaUrl && event.mediaType === 'video') {
+        return `<div class="thumb">🎬</div>`;
+      }
+      return `<div class="thumb">🎉</div>`;
+    }
+
+    async function renderDashboard() {
+      setActiveNav('dashboard');
+      const user = getCurrentUser();
+      const stats = await API.dashboard.getStats();
+      const eventsRes = await API.dashboard.getRecentEvents();
+      const recentEvents = eventsRes.events || [];
+      const remainingInvitations = user?.subscription?.remainingInvitations ?? 0;
+
+      const statCards = [
+        { title: 'إجمالي المناسبات', value: stats.totalEvents || 0, icon: '🎉', color: 'blue' },
+        { title: 'إجمالي الضيوف', value: stats.totalGuests || 0, icon: '👥', color: 'green' },
+        { title: 'تأكيد الحضور', value: `${stats.confirmationRate || 0}%`, icon: '✅', color: 'purple' },
+        { title: 'الدعوات المتبقية', value: remainingInvitations, icon: '📨', color: 'orange' }
+      ];
+
+      $('#app').innerHTML = `
+        <div class="page-header">
+          <h1>مرحباً، ${escapeHtml(user?.displayName || 'مستخدم')} 👋</h1>
+          <p class="muted">مرحباً بك في منصة جيّة لإدارة الدعوات الرقمية</p>
+        </div>
+
+        <div class="grid stats-grid">
+          ${statCards.map((card) => `
+            <div class="card stat-card">
+              <div>
+                <div class="stat-title">${card.title}</div>
+                <div class="stat-value">${card.value}</div>
+                ${card.title === 'الدعوات المتبقية' && remainingInvitations === 0 ? '<a href="#/subscription" class="small" style="text-decoration:underline;display:block;margin-top:10px">نفذت الدعوات، اضغط لشراء باقة</a>' : ''}
+              </div>
+              <div class="stat-icon ${card.color}">${card.icon}</div>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="actions-row">
+          <a href="#/create-event" class="btn btn-primary"><span style="font-size:20px">+</span> إنشاء مناسبة جديدة</a>
+          <a href="#/analytics" class="btn btn-soft"><span style="font-size:20px">📊</span> عرض التحليلات</a>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><h2 style="margin:0">مناسباتي</h2></div>
+          ${recentEvents.length === 0 ? `
+            <div class="empty-state">
+              <div class="empty-icon">🎉</div>
+              <p>لا توجد مناسبات بعد</p>
+              <a href="#/create-event" class="btn btn-primary">إنشاء مناسبة جديدة</a>
+            </div>
+          ` : `
+            <div class="event-list">
+              ${recentEvents.map((event) => `
+                <div class="event-row">
+                  <div class="event-main">
+                    ${mediaThumb(event)}
+                    <div>
+                      <div class="event-title">${escapeHtml(event.name)}</div>
+                      <div class="event-meta">
+                        <span>📅 ${formatDate(event.date)}</span>
+                        <span>📍 ${escapeHtml(event.location?.name || 'غير محدد')}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row-actions">
+                    <a href="#/events/${event.id}">تفاصيل</a>
+                    <a href="#/events/${event.id}/guests">إدارة الضيوف</a>
+                    <button class="danger-text" data-delete-event="${event.id}" data-event-name="${escapeHtml(event.name)}">حذف</button>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          `}
+        </div>
+      `;
+
+      $$('[data-delete-event]').forEach((button) => {
+        button.addEventListener('click', async () => {
+          const eventId = button.dataset.deleteEvent;
+          const eventName = button.dataset.eventName;
+          if (confirm(`هل أنت متأكد من حذف مناسبة "${eventName}"؟`)) {
+            await API.events.delete(eventId);
+            showToast('تم حذف المناسبة بنجاح', 'success');
+            renderDashboard();
+          }
+        });
+      });
+    }
+
+    function readFileAsDataURL(file) {
+      return new Promise((resolve, reject) => {
+        if (!file) return resolve('');
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function renderCreateEvent() {
+      setActiveNav('create-event');
+      const user = getCurrentUser();
+      const remaining = user?.subscription?.remainingInvitations ?? 0;
+
+      $('#app').innerHTML = `
+        <div class="form-card">
+          <div class="page-header">
+            <h1>إنشاء مناسبة جديدة</h1>
+            <p class="muted">أدخل تفاصيل مناسبتك وحدد الموقع على الخريطة</p>
+            ${remaining <= 0 ? '<div class="alert alert-warning">⚠️ لا توجد دعوات متبقية. يرجى شراء باقة اشتراك للاستمرار.</div>' : ''}
+          </div>
+
+          <div class="card card-body">
+            <form id="createEventForm" class="form-grid">
+              <div>
+                <label class="field-label">اسم المناسبة *</label>
+                <input type="text" name="name" required placeholder="مثال: حفل زفاف أحمد وسارة" />
+              </div>
+
+              <div>
+                <label class="field-label">تاريخ المناسبة *</label>
+                <input type="date" name="date" required />
+              </div>
+
+              <div>
+                <label class="field-label">موقع المناسبة *</label>
+                <div class="map-placeholder" id="mapBox">
+                  <div class="map-pin">📍</div>
+                  <div class="map-controls">
+                    <input type="text" id="locationAddress" placeholder="اكتب عنوان الموقع أو اسم القاعة" value="دبي، الإمارات العربية المتحدة" />
+                    <button class="btn btn-primary" id="selectLocationBtn" type="button">تحديد الموقع</button>
+                  </div>
+                </div>
+                <div id="locationStatus" class="small muted" style="margin-top:8px">لم يتم تحديد الموقع بعد</div>
+              </div>
+
+              <div>
+                <label class="field-label">وسائط الدعوة</label>
+                <div class="radio-grid">
+                  <label class="radio-card"><input type="radio" name="mediaType" value="image" checked /> صورة</label>
+                  <label class="radio-card"><input type="radio" name="mediaType" value="video" /> فيديو</label>
+                  <label class="radio-card"><input type="radio" name="mediaType" value="none" /> بدون</label>
+                </div>
+
+                <div class="drop-zone" id="dropZone" style="margin-top:14px">
+                  <input id="mediaFile" type="file" accept="image/*" hidden />
+                  <div id="mediaPreview">
+                    <div style="font-size:42px;margin-bottom:8px">🖼️</div>
+                    <p class="muted" style="margin-bottom:4px">اضغط لرفع صورة الدعوة</p>
+                    <div class="small muted">يدعم JPG, PNG, WebP</div>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label class="field-label">وصف المناسبة</label>
+                <textarea name="description" placeholder="تفاصيل إضافية عن المناسبة..."></textarea>
+              </div>
+
+              <button class="btn btn-primary" type="submit" ${remaining <= 0 ? 'disabled' : ''}>إنشاء المناسبة</button>
+            </form>
+          </div>
+        </div>
+      `;
+
+      let selectedLocation = null;
+      const fileInput = $('#mediaFile');
+      const mediaPreview = $('#mediaPreview');
+      const dropZone = $('#dropZone');
+
+      $('#selectLocationBtn').addEventListener('click', () => {
+        const address = $('#locationAddress').value.trim() || 'موقع محدد';
+        selectedLocation = { address, lat: 25.2048, lng: 55.2708 };
+        $('#locationStatus').innerHTML = `<span class="green-text">✓ تم تحديد الموقع: ${escapeHtml(address)}</span>`;
+      });
+
+      function updateAcceptAndLabel() {
+        const mediaType = $('input[name="mediaType"]:checked').value;
+        if (mediaType === 'none') {
+          dropZone.style.display = 'none';
+          fileInput.value = '';
+          return;
+        }
+        dropZone.style.display = 'block';
+        fileInput.accept = mediaType === 'image' ? 'image/*' : 'video/*';
+        mediaPreview.innerHTML = `
+          <div style="font-size:42px;margin-bottom:8px">${mediaType === 'image' ? '🖼️' : '🎬'}</div>
+          <p class="muted" style="margin-bottom:4px">اضغط لرفع ${mediaType === 'image' ? 'صورة' : 'فيديو'} الدعوة</p>
+          <div class="small muted">${mediaType === 'image' ? 'يدعم JPG, PNG, WebP' : 'يدعم MP4, MOV, AVI'}</div>
+        `;
+      }
+
+      $$('input[name="mediaType"]').forEach((radio) => radio.addEventListener('change', updateAcceptAndLabel));
+      dropZone.addEventListener('click', () => fileInput.click());
+      fileInput.addEventListener('change', () => {
+        const file = fileInput.files?.[0];
+        if (!file) return;
+        const objectUrl = URL.createObjectURL(file);
+        const mediaType = $('input[name="mediaType"]:checked').value;
+        mediaPreview.innerHTML = mediaType === 'image'
+          ? `<img src="${objectUrl}" alt="Preview" /><p class="small muted" style="margin-top:8px">اضغط لتغيير الملف</p>`
+          : `<video src="${objectUrl}" controls></video><p class="small muted" style="margin-top:8px">اضغط لتغيير الملف</p>`;
+      });
+
+      $('#createEventForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!selectedLocation) {
+          showToast('الرجاء تحديد موقع المناسبة على الخريطة', 'error');
+          return;
+        }
+        const form = e.currentTarget;
+        const submitButton = form.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+        submitButton.textContent = 'جاري الإنشاء...';
+
+        try {
+          const mediaType = $('input[name="mediaType"]:checked').value;
+          const file = fileInput.files?.[0];
+          const mediaUrl = mediaType !== 'none' && file ? await readFileAsDataURL(file) : '';
+          const result = await API.events.create({
+            name: form.name.value.trim(),
+            date: form.date.value,
+            location: {
+              name: $('#locationAddress').value.trim() || selectedLocation.address,
+              address: selectedLocation.address,
+              coordinates: { lat: selectedLocation.lat, lng: selectedLocation.lng }
+            },
+            description: form.description.value.trim(),
+            mediaUrl,
+            mediaType
+          });
+
+          if (result.success) {
+            showToast('تم إنشاء المناسبة بنجاح', 'success');
+            location.hash = '#/dashboard';
+          } else if (result.needUpgrade) {
+            showToast(result.error, 'error');
+            location.hash = '#/subscription';
+          } else {
+            showToast(result.error || 'فشل إنشاء المناسبة', 'error');
+          }
+        } catch (error) {
+          showToast(error.message || 'فشل إنشاء المناسبة', 'error');
+        } finally {
+          submitButton.disabled = false;
+          submitButton.textContent = 'إنشاء المناسبة';
+        }
+      });
+    }
+
+    async function renderEventDetails(eventId) {
+      setActiveNav('event-details');
+      const user = getCurrentUser();
+      const eventRes = await API.events.getById(eventId);
+      const stats = await API.events.getStats(eventId);
+      const event = eventRes.event;
+
+      if (!event) {
+        $('#app').innerHTML = `<div class="card card-body"><h1>المناسبة غير موجودة</h1><a href="#/dashboard" class="btn btn-primary">العودة للوحة التحكم</a></div>`;
+        return;
+      }
+
+      $('#app').innerHTML = `
+        <div class="page-header">
+          <a href="#/dashboard" class="link-button">← العودة إلى لوحة التحكم</a>
+          <h1 style="margin-top:8px">${escapeHtml(event.name)}</h1>
+          <p class="muted">${formatDate(event.date)}</p>
+        </div>
+
+        <div class="grid details-grid">
+          <div class="grid">
+            <div class="card">
+              <div class="media-frame">
+                ${event.mediaUrl ? (event.mediaType === 'video'
+                  ? `<video src="${event.mediaUrl}" controls></video>`
+                  : `<img src="${event.mediaUrl}" alt="Event invitation" />`)
+                  : `<div class="empty-state"><div class="empty-icon">🖼️</div><p>لا توجد وسائط دعوة</p></div>`}
+                <button class="floating-edit" id="openMediaModal">✏️ تغيير الوسائط</button>
+              </div>
+            </div>
+
+            <div class="card card-body">
+              <h2>تفاصيل المناسبة</h2>
+              <div class="info-row"><span class="info-label">الموقع:</span><strong>${escapeHtml(event.location?.name || 'غير محدد')}</strong></div>
+              <div class="info-row"><span class="info-label">العنوان:</span><span>${escapeHtml(event.location?.address || 'غير محدد')}</span></div>
+              <div class="info-row"><span class="info-label">الوصف:</span><span>${escapeHtml(event.description || 'لا يوجد وصف')}</span></div>
+            </div>
+
+            <div class="card card-body">
+              <h2>إحصائيات سريعة</h2>
+              <div class="grid two-grid">
+                <div class="quick-stat"><div class="quick-stat-value">${stats.total || 0}</div><div class="small muted">إجمالي الضيوف</div></div>
+                <div class="quick-stat"><div class="quick-stat-value green-text">${stats.confirmed || 0}</div><div class="small muted">مؤكد حضور</div></div>
+                <div class="quick-stat"><div class="quick-stat-value red-text">${stats.declined || 0}</div><div class="small muted">معتذر</div></div>
+                <div class="quick-stat"><div class="quick-stat-value blue-text">${stats.attended || 0}</div><div class="small muted">حضر فعلياً</div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid">
+            <div class="card card-body">
+              <h2>إجراءات سريعة</h2>
+              <div class="grid" style="gap:12px">
+                <a href="#/events/${event.id}/guests" class="btn btn-primary">إدارة الضيوف</a>
+                <button class="btn btn-warn" id="shareLinkBtn" type="button">مشاركة رابط الدعوة</button>
+                <button class="btn btn-danger" id="deleteEventBtn" type="button">حذف المناسبة</button>
+              </div>
+            </div>
+
+            <div class="card card-body">
+              <h2>معلومات الاشتراك</h2>
+              <div class="info-row"><span class="muted">الدعوات المستخدمة:</span><strong>${user?.subscription?.usedInvitations || 0}</strong></div>
+              <div class="info-row"><span class="muted">الدعوات المتبقية:</span><strong>${user?.subscription?.remainingInvitations || 0}</strong></div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      $('#openMediaModal').addEventListener('click', () => openMediaModal(event));
+      $('#shareLinkBtn').addEventListener('click', async () => {
+        const inviteUrl = `${location.origin}${location.pathname}#/invite/${event.uniqueLink}`;
+        try {
+          await navigator.clipboard.writeText(inviteUrl);
+          showToast('تم نسخ رابط الدعوة', 'success');
+        } catch {
+          prompt('انسخ رابط الدعوة:', inviteUrl);
+        }
+      });
+      $('#deleteEventBtn').addEventListener('click', async () => {
+        if (confirm('هل أنت متأكد من حذف هذه المناسبة؟')) {
+          await API.events.delete(event.id);
+          showToast('تم حذف المناسبة بنجاح', 'success');
+          location.hash = '#/dashboard';
+        }
+      });
+    }
+
+    function openMediaModal(event) {
+      const modal = $('#mediaModal');
+      modal.innerHTML = `
+        <div class="modal">
+          <h2>تغيير وسائط الدعوة</h2>
+          <div class="form-grid">
+            <div>
+              <label class="field-label">نوع الوسائط</label>
+              <div class="radio-grid" style="grid-template-columns:repeat(2,1fr)">
+                <label class="radio-card"><input type="radio" name="modalMediaType" value="image" checked /> صورة</label>
+                <label class="radio-card"><input type="radio" name="modalMediaType" value="video" /> فيديو</label>
+              </div>
+            </div>
+            <div class="drop-zone" id="modalDropZone">
+              <input id="modalMediaFile" type="file" accept="image/*" hidden />
+              <div id="modalPreview"><div style="font-size:42px">🖼️</div><p class="muted">اضغط لرفع صورة</p></div>
+            </div>
+            <div class="actions-row" style="margin-bottom:0">
+              <button class="btn btn-primary" id="saveMediaBtn" type="button" disabled>حفظ</button>
+              <button class="btn btn-outline" id="closeMediaModal" type="button">إلغاء</button>
+            </div>
+          </div>
+        </div>
+      `;
+      modal.classList.add('show');
+
+      const fileInput = $('#modalMediaFile');
+      const preview = $('#modalPreview');
+      const drop = $('#modalDropZone');
+      const saveButton = $('#saveMediaBtn');
+
+      $$('input[name="modalMediaType"]').forEach((radio) => radio.addEventListener('change', () => {
+        const type = $('input[name="modalMediaType"]:checked').value;
+        fileInput.accept = type === 'image' ? 'image/*' : 'video/*';
+        fileInput.value = '';
+        saveButton.disabled = true;
+        preview.innerHTML = `<div style="font-size:42px">${type === 'image' ? '🖼️' : '🎬'}</div><p class="muted">اضغط لرفع ${type === 'image' ? 'صورة' : 'فيديو'}</p>`;
+      }));
+
+      drop.addEventListener('click', () => fileInput.click());
+      fileInput.addEventListener('change', () => {
+        const file = fileInput.files?.[0];
+        if (!file) return;
+        const url = URL.createObjectURL(file);
+        const type = $('input[name="modalMediaType"]:checked').value;
+        preview.innerHTML = type === 'image'
+          ? `<img src="${url}" alt="Preview" /><p class="small muted" style="margin-top:8px">اضغط لتغيير الملف</p>`
+          : `<video src="${url}" controls></video><p class="small muted" style="margin-top:8px">اضغط لتغيير الملف</p>`;
+        saveButton.disabled = false;
+      });
+
+      $('#closeMediaModal').addEventListener('click', () => modal.classList.remove('show'));
+      modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('show'); }, { once: true });
+      saveButton.addEventListener('click', async () => {
+        const file = fileInput.files?.[0];
+        if (!file) {
+          showToast('الرجاء اختيار ملف', 'error');
+          return;
+        }
+        const mediaType = $('input[name="modalMediaType"]:checked').value;
+        const mediaUrl = await readFileAsDataURL(file);
+        await API.events.updateMedia(event.id, { mediaUrl, mediaType });
+        showToast('تم تحديث وسائط الدعوة بنجاح', 'success');
+        modal.classList.remove('show');
+        renderEventDetails(event.id);
+      });
+    }
+
+    async function renderGuests(eventId) {
+      setActiveNav('guests');
+      const event = getEvents().find((e) => e.id === eventId);
+      const guests = getGuestsForEvent(eventId);
+      $('#app').innerHTML = `
+        <div class="page-header">
+          <a href="#/events/${eventId}" class="link-button">← العودة إلى تفاصيل المناسبة</a>
+          <h1 style="margin-top:8px">إدارة الضيوف</h1>
+          <p class="muted">${escapeHtml(event?.name || 'مناسبة')}</p>
+        </div>
+        <div class="card">
+          <div class="card-header"><h2 style="margin:0">قائمة الضيوف</h2><span class="subscription-pill">${guests.length} ضيوف</span></div>
+          ${guests.length ? guests.map((guest) => `
+            <div class="event-row">
+              <div class="event-main"><div class="thumb">👤</div><div><div class="event-title">${escapeHtml(guest.name)}</div><div class="event-meta"><span>${escapeHtml(guest.phone || '')}</span><span>الحالة: ${escapeHtml(guest.status)}</span></div></div></div>
+            </div>
+          `).join('') : '<div class="empty-state"><div class="empty-icon">👥</div><p>لا يوجد ضيوف بعد</p></div>'}
+        </div>
+      `;
+    }
+
+    function renderPlaceholder(route) {
+      const isAnalytics = route === 'analytics';
+      setActiveNav(route);
+      $('#app').innerHTML = `
+        <div class="card card-body">
+          <h1>${isAnalytics ? 'التحليلات' : 'الاشتراك'}</h1>
+          <p class="muted">هذه صفحة عرض بسيطة فقط حتى تشاهد الربط داخل ملف HTML واحد.</p>
+          <div class="alert alert-info">الصفحة الأصلية غير مرفوعة ضمن الملفات، لذلك تم وضع Placeholder مؤقت.</div>
+          <div style="margin-top:18px"><a href="#/dashboard" class="btn btn-primary">العودة للوحة التحكم</a></div>
+        </div>
+      `;
+    }
+
+    function router() {
+      $('#sidebar').classList.remove('open');
+      const hash = location.hash || '#/dashboard';
+      const parts = hash.replace(/^#\/?/, '').split('/').filter(Boolean);
+      const route = parts[0] || 'dashboard';
+
+      if (route === 'dashboard') return renderDashboard();
+      if (route === 'create-event') return renderCreateEvent();
+      if (route === 'events' && parts[1] && parts[2] === 'guests') return renderGuests(parts[1]);
+      if (route === 'events' && parts[1]) return renderEventDetails(parts[1]);
+      if (route === 'analytics') return renderPlaceholder('analytics');
+      if (route === 'subscription') return renderPlaceholder('subscription');
+      location.hash = '#/dashboard';
+    }
+
+    $('#openMenuBtn').addEventListener('click', () => $('#sidebar').classList.add('open'));
+    $('#resetDemoBtn').addEventListener('click', () => {
+      if (!confirm('سيتم حذف بيانات العرض الحالية وإعادة البيانات التجريبية. هل تريد المتابعة؟')) return;
+      Object.keys(localStorage).forEach((key) => {
+        if (key.startsWith('gaiah_')) localStorage.removeItem(key);
+      });
+      seedDemoData(true);
+      showToast('تمت إعادة ضبط بيانات العرض', 'success');
+      location.hash = '#/dashboard';
+      router();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        $('#sidebar').classList.remove('open');
+        $('#mediaModal').classList.remove('show');
+      }
+    });
+
+    seedDemoData(false);
+    window.addEventListener('hashchange', router);
+    router();
+  </script>
+</body>
+</html>

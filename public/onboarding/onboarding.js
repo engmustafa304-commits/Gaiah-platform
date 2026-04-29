@@ -10,7 +10,7 @@ import { getFormValues, qs, qsa, setAlert, setLoading } from '../shared/ui.js';
 
 const dashboardPath = '/dashboard/index.html';
 const fallbackRedirectPath = '/';
-const dashboardExists = false;
+const dashboardExists = true;
 
 const searchParams = new URLSearchParams(window.location.search);
 const selectedPlanId = searchParams.get('plan') || 'basic';
@@ -83,7 +83,6 @@ function getSelectedGuestCount() {
 }
 
 function getSuccessRedirectPath() {
-  // TODO: Set dashboardExists to true when public/dashboard/index.html is created.
   return dashboardExists ? dashboardPath : fallbackRedirectPath;
 }
 

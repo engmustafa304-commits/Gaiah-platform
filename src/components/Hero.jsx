@@ -1,5 +1,4 @@
 import React from 'react'
-import { Link } from 'react-router-dom';
 
 const Hero = () => {
   return (
@@ -44,11 +43,11 @@ const Hero = () => {
             </p>
 
             {/* زر */}
-            <Link to="/login">
+            <a href="/login/index.html">
               <button className="bg-white text-black px-8 py-3 rounded-full text-lg font-semibold hover:bg-gray-200 transition-all shadow-xl">
                 ابدأ الآن
               </button>
-            </Link>
+            </a>
 
           </div>
 

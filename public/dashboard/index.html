@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>لوحة التحكم | جيّة</title>
+    <link rel="stylesheet" href="/shared/gaiah-ui.css" />
+    <link rel="stylesheet" href="./dashboard.css" />
+  </head>
+  <body>
+    <main id="clientDashboardApp" class="client-shell">
+      <aside class="client-sidebar">
+        <a class="dashboard-brand" href="/">جيّة</a>
+
+        <div class="sidebar-user">
+          <span class="sidebar-label">حساب العميل</span>
+          <strong id="topbarUser">عميل جديد</strong>
+          <small id="sidebarUserMeta">-</small>
+        </div>
+
+        <nav class="client-nav" id="clientNav" aria-label="تنقل لوحة العميل">
+          <a class="client-nav-link active" href="#home" data-page="home">الرئيسية</a>
+          <a class="client-nav-link" href="#events" data-page="events">المناسبات</a>
+          <a class="client-nav-link" href="#subscriptions" data-page="subscriptions">الاشتراكات</a>
+          <a class="client-nav-link" href="#statistics" data-page="statistics">الإحصائيات</a>
+        </nav>
+
+        <button id="logoutButton" class="btn btn-secondary sidebar-logout" type="button">تسجيل الخروج</button>
+      </aside>
+
+      <section class="client-main">
+        <header class="client-topbar">
+          <div>
+            <p class="eyebrow">لوحة العميل</p>
+            <h1 id="pageTitle">الرئيسية</h1>
+          </div>
+          <div class="topbar-summary">
+            <span id="topbarHall">لم يتم تحديد القاعة بعد</span>
+            <span id="topbarEmail">-</span>
+          </div>
+        </header>
+
+        <section id="dashboardState" class="dashboard-state card">
+          <h1 id="stateTitle">جار تحميل لوحة التحكم...</h1>
+          <p id="stateMessage">يتم التحقق من حالة تسجيل الدخول.</p>
+          <div id="stateActions" class="state-actions hidden"></div>
+        </section>
+
+        <section id="homePage" class="client-page hidden" data-page="home">
+          <section id="welcomeSection" class="welcome-card card hidden">
+            <div>
+              <p class="eyebrow">الرئيسية</p>
+              <h2>مرحباً، <span id="clientName">عميل جديد</span></h2>
+              <p>تابع حالة اشتراكك، المدفوعات، وتجهيز الدعوات من مكان واحد.</p>
+            </div>
+            <a class="btn btn-gradient" href="/">اختيار باقة جديدة</a>
+          </section>
+
+          <section id="dashboardGrid" class="dashboard-grid hidden">
+            <article id="clientSummary" class="card client-summary">
+              <div class="section-title">
+                <span>بيانات العميل</span>
+              </div>
+              <dl class="summary-list">
+                <div>
+                  <dt>اسم القاعة</dt>
+                  <dd id="clientHall">-</dd>
+                </div>
+                <div>
+                  <dt>البريد الإلكتروني</dt>
+                  <dd id="clientEmail">-</dd>
+                </div>
+                <div>
+                  <dt>رقم الواتساب</dt>
+                  <dd id="clientWhatsapp">-</dd>
+                </div>
+                <div>
+                  <dt>حالة الحساب</dt>
+                  <dd><span id="clientAccountStatus" class="status-badge badge-pending">-</span></dd>
+                </div>
+              </dl>
+            </article>
+
+            <article id="profileNotice" class="card profile-notice hidden">
+              <div>
+                <span class="notice-label">خطوة مقترحة</span>
+                <h2>حسابك جاهز، ويمكنك اختيار باقة لبدء طلب الاشتراك.</h2>
+                <p>بعد اختيار الباقة سيتم إنشاء طلب اشتراكك ومتابعة حالته من هذه اللوحة.</p>
+              </div>
+              <a class="btn btn-gradient" href="/">اختيار باقة</a>
+            </article>
+
+            <section id="homeStats" class="stats-grid" aria-label="ملخص الاشتراكات">
+              <article class="card stat-card">
+                <span>إجمالي الاشتراكات</span>
+                <strong id="statTotalSubscriptions">0</strong>
+              </article>
+              <article class="card stat-card">
+                <span>اشتراكات نشطة</span>
+                <strong id="statActiveSubscriptions">0</strong>
+              </article>
+              <article class="card stat-card">
+                <span>طلبات قيد المراجعة</span>
+                <strong id="statPendingSubscriptions">0</strong>
+              </article>
+              <article class="card stat-card">
+                <span>مدفوعات غير مكتملة</span>
+                <strong id="statUnpaidSubscriptions">0</strong>
+              </article>
+            </section>
+          </section>
+
+          <section id="latestSubscriptions" class="subscriptions-section hidden">
+            <div class="section-title">
+              <span>أحدث طلبات الاشتراك</span>
+              <span class="section-hint">ملخص آخر الطلبات المسجلة</span>
+            </div>
+            <div id="latestSubscriptionsList" class="subscriptions-list"></div>
+          </section>
+        </section>
+
+        <section id="eventsPage" class="client-page hidden" data-page="events">
+          <div class="events-page-header">
+            <div class="page-heading">
+              <h2>المناسبات</h2>
+              <p>أنشئ مناسباتك وخصص رصيد الدعوات من اشتراكاتك النشطة.</p>
+            </div>
+            <button id="openCreateEventButton" class="btn btn-gradient" type="button">إنشاء مناسبة جديدة</button>
+          </div>
+
+          <section class="placeholder-stats events-summary-grid">
+            <article class="card stat-card"><span>المناسبات النشطة</span><strong id="eventStatActive">0</strong></article>
+            <article class="card stat-card"><span>الدعوات المخصصة</span><strong id="eventStatAllocated">0</strong></article>
+            <article class="card stat-card"><span>الدعوات المرسلة</span><strong id="eventStatSent">0</strong></article>
+            <article class="card stat-card"><span>المناسبات القادمة</span><strong id="eventStatUpcoming">0</strong></article>
+          </section>
+
+          <article class="card events-list-card">
+            <div class="section-title">
+              <span>قائمة المناسبات</span>
+              <span class="section-hint">بيانات تجريبية للمعاينة فقط</span>
+            </div>
+            <div id="eventsList" class="events-list"></div>
+          </article>
+
+          <section id="createEventPanel" class="create-event-panel hidden" aria-live="polite">
+            <article class="card create-event-card">
+              <div class="section-title">
+                <span>إنشاء مناسبة جديدة</span>
+                <button id="closeCreateEventButton" class="panel-close-button" type="button" aria-label="إغلاق">إغلاق</button>
+              </div>
+
+              <form id="createEventForm" class="create-event-form">
+                <div class="event-form-grid">
+                  <label class="form-field">
+                    <span>اسم المناسبة</span>
+                    <input id="eventName" name="eventName" type="text" required />
+                  </label>
+
+                  <label class="form-field">
+                    <span>نوع المناسبة</span>
+                    <select id="eventType" name="eventType" required>
+                      <option value="">اختر نوع المناسبة</option>
+                      <option value="wedding">زواج</option>
+                      <option value="engagement">خطوبة</option>
+                      <option value="celebration">احتفال</option>
+                      <option value="meeting">اجتماع</option>
+                      <option value="other">أخرى</option>
+                    </select>
+                  </label>
+
+                  <label class="form-field">
+                    <span>تاريخ المناسبة</span>
+                    <input id="eventDate" name="eventDate" type="date" required />
+                  </label>
+
+                  <label class="form-field">
+                    <span>وقت المناسبة</span>
+                    <input id="eventTime" name="eventTime" type="time" required />
+                  </label>
+
+                  <label class="form-field event-location-field">
+                    <span>موقع المناسبة</span>
+                    <input id="eventLocation" name="eventLocation" type="text" required />
+                  </label>
+                </div>
+
+                <section class="allocation-section">
+                  <div>
+                    <h3>تخصيص رصيد الدعوات</h3>
+                    <p>اختر من الاشتراكات النشطة وحدد عدد الدعوات التي تريد تخصيصها لهذه المناسبة.</p>
+                  </div>
+                  <div id="planAllocationList" class="plan-allocation-list"></div>
+                  <div id="allocationSummary" class="allocation-summary">إجمالي الدعوات المخصصة لهذه المناسبة: <strong>0</strong></div>
+                  <div id="eventFormAlert" class="event-form-alert hidden"></div>
+                </section>
+
+                <div class="form-actions">
+                  <button id="cancelCreateEventButton" class="btn btn-secondary" type="button">إلغاء</button>
+                  <button id="submitCreateEventButton" class="btn btn-gradient" type="submit">إنشاء المناسبة</button>
+                </div>
+              </form>
+            </article>
+          </section>
+        </section>
+
+        <section id="subscriptionsPage" class="client-page hidden" data-page="subscriptions">
+          <div class="subscriptions-page-header">
+            <div class="page-heading">
+              <h2>الاشتراكات</h2>
+              <p>تابع باقاتك، حالة الطلبات، ورصيد الدعوات المتاح لكل اشتراك.</p>
+            </div>
+            <button id="buyMorePlansButton" class="btn btn-gradient" type="button">شراء باقة إضافية</button>
+          </div>
+
+          <section id="subscriptionBalanceStats" class="subscription-balance-stats">
+            <article class="card stat-card"><span>إجمالي الدعوات</span><strong id="subscriptionTotalInvitations">0</strong></article>
+            <article class="card stat-card"><span>الدعوات المخصصة</span><strong id="subscriptionAllocatedInvitations">0</strong></article>
+            <article class="card stat-card"><span>الدعوات المرسلة</span><strong id="subscriptionSentInvitations">0</strong></article>
+            <article class="card stat-card"><span>الدعوات المتبقية</span><strong id="subscriptionRemainingInvitations">0</strong></article>
+          </section>
+          <div id="usablePlansNote" class="usable-plans-note"></div>
+
+          <article id="subscriptionsEmptyState" class="card empty-state hidden">
+            <h2>لا توجد اشتراكات أو طلبات حتى الآن</h2>
+            <a class="btn btn-gradient" href="/">اختيار باقة</a>
+          </article>
+
+          <section class="subscription-detail-section">
+            <div class="section-title">
+              <span>الاشتراكات النشطة</span>
+              <span class="section-hint">رصيد الدعوات هنا للمعاينة فقط حتى ربط المرحلة القادمة</span>
+            </div>
+            <div id="activePlansList" class="detailed-plans-list"></div>
+          </section>
+
+          <section class="subscription-detail-section">
+            <div class="section-title">
+              <span>طلبات قيد المراجعة</span>
+            </div>
+            <div id="pendingPlansList" class="detailed-plans-list"></div>
+          </section>
+
+          <section class="subscription-detail-section">
+            <div class="section-title">
+              <span>طلبات مرفوضة أو منتهية</span>
+            </div>
+            <div id="closedPlansList" class="detailed-plans-list"></div>
+          </section>
+
+          <section id="subscriptionDetailsPanel" class="subscription-details-panel hidden">
+            <article class="card subscription-details-card">
+              <div class="section-title">
+                <span>تفاصيل الاشتراك</span>
+                <button id="closeSubscriptionDetailsButton" class="panel-close-button" type="button">إغلاق</button>
+              </div>
+              <div id="subscriptionDetailsContent"></div>
+            </article>
+          </section>
+        </section>
+
+        <section id="statisticsPage" class="client-page hidden" data-page="statistics">
+          <div class="page-heading">
+            <h2>الإحصائيات</h2>
+            <p>ملخص استهلاك الدعوات وأداء المناسبات سيظهر هنا بعد تفعيل إدارة المناسبات.</p>
+          </div>
+          <section class="placeholder-stats">
+            <article class="card stat-card"><span>إجمالي الدعوات</span><strong>0</strong></article>
+            <article class="card stat-card"><span>الدعوات المستخدمة</span><strong>0</strong></article>
+            <article class="card stat-card"><span>الدعوات المتبقية</span><strong>0</strong></article>
+            <article class="card stat-card"><span>نسبة الاستخدام</span><strong>0%</strong></article>
+          </section>
+          <article class="card chart-placeholder">
+            <h3>منطقة الإحصائيات</h3>
+            <p>سيتم عرض الإحصائيات بعد إنشاء المناسبات وإرسال الدعوات.</p>
+          </article>
+        </section>
+
+        <section id="subscriptionsSection" class="client-page hidden">
+          <div class="section-title">
+            <span>سجل طلبات الاشتراك</span>
+            <span class="section-hint">تابع طلباتك الحالية والسابقة</span>
+          </div>
+          <div id="subscriptionsList" class="subscriptions-list"></div>
+          <article id="emptyState" class="card empty-state hidden">
+            <h2>لا توجد طلبات اشتراك بعد</h2>
+            <a class="btn btn-gradient" href="/">اختيار باقة</a>
+          </article>
+        </section>
+      </section>
+    </main>
+
+    <script type="module" src="./dashboard.js"></script>
+  </body>
+</html>

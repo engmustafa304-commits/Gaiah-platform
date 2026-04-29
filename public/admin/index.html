@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>لوحة مدير النظام | جيّة</title>
+    <link rel="stylesheet" href="/shared/gaiah-ui.css" />
+    <link rel="stylesheet" href="./admin.css" />
+  </head>
+  <body>
+    <main id="adminApp" class="admin-shell">
+      <aside class="admin-sidebar">
+        <a class="admin-brand" href="/">جيّة</a>
+        <nav id="adminNav" class="admin-nav" aria-label="تنقل لوحة مدير النظام">
+          <a href="#home" data-page="home">الرئيسية</a>
+          <a href="#clients" data-page="clients">العملاء</a>
+          <a href="#requests" data-page="requests">الطلبات</a>
+        </nav>
+        <div class="admin-identity">
+          <span>مدير النظام</span>
+          <button id="logoutButton" class="btn btn-secondary" type="button">تسجيل الخروج</button>
+        </div>
+      </aside>
+
+      <section class="admin-main">
+        <header class="admin-topbar">
+          <div>
+            <p class="eyebrow">إدارة النظام</p>
+            <h1 id="pageTitle">الرئيسية</h1>
+          </div>
+          <span class="admin-mode">بيانات تجريبية للعرض فقط</span>
+        </header>
+
+        <div id="adminToast" class="admin-toast hidden"></div>
+        <section id="adminState" class="card admin-state hidden">
+          <h2 id="adminStateTitle">جار تحميل لوحة الإدارة...</h2>
+          <p id="adminStateMessage">يتم التحقق من صلاحية مدير النظام.</p>
+          <div id="adminStateActions" class="state-actions hidden"></div>
+        </section>
+
+        <section id="adminLoginPanel" class="card admin-login-panel hidden">
+          <div>
+            <h2>تسجيل دخول مدير النظام</h2>
+            <p>استخدم حساب مدير النظام للوصول إلى لوحة الإدارة.</p>
+          </div>
+          <div id="adminLoginAlert" class="admin-login-alert hidden"></div>
+          <form id="adminLoginForm" class="admin-login-form">
+            <label>
+              <span>البريد الإلكتروني</span>
+              <input id="adminLoginEmail" name="email" type="email" autocomplete="email" required />
+            </label>
+            <label>
+              <span>كلمة المرور</span>
+              <input id="adminLoginPassword" name="password" type="password" autocomplete="current-password" required />
+            </label>
+            <div class="admin-login-actions">
+              <button class="btn btn-gradient" type="submit">تسجيل الدخول</button>
+              <a class="btn btn-secondary" href="/">العودة للصفحة الرئيسية</a>
+            </div>
+          </form>
+        </section>
+
+        <section id="homePage" class="admin-page">
+          <div id="overviewStats" class="stats-grid"></div>
+          <div class="home-grid">
+            <article class="card admin-card">
+              <div class="section-title">
+                <span>أحدث الطلبات</span>
+              </div>
+              <div id="recentRequests" class="compact-list"></div>
+            </article>
+            <article class="card admin-card">
+              <div class="section-title">
+                <span>تنبيهات المتابعة</span>
+              </div>
+              <div id="notificationsPanel" class="notification-list"></div>
+            </article>
+          </div>
+        </section>
+
+        <section id="clientsPage" class="admin-page hidden">
+          <div class="toolbar card">
+            <label>
+              <span>بحث</span>
+              <input id="clientSearch" type="search" placeholder="اسم العميل، القاعة، البريد" />
+            </label>
+            <label>
+              <span>حالة الحساب</span>
+              <select id="clientStatusFilter">
+                <option value="">كل الحالات</option>
+                <option value="pending">قيد المراجعة</option>
+                <option value="active">نشط</option>
+                <option value="rejected">مرفوض</option>
+                <option value="suspended">موقوف</option>
+              </select>
+            </label>
+          </div>
+          <div class="content-grid">
+            <article class="card table-card">
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>العميل</th>
+                      <th>القاعة</th>
+                      <th>البريد الإلكتروني</th>
+                      <th>رقم الواتساب</th>
+                      <th>حالة الحساب</th>
+                      <th>عدد الاشتراكات</th>
+                      <th>آخر طلب</th>
+                      <th>إجراء</th>
+                    </tr>
+                  </thead>
+                  <tbody id="clientsTable"></tbody>
+                </table>
+              </div>
+            </article>
+            <aside id="clientDetailsPanel" class="card details-panel">
+              <h2>تفاصيل العميل</h2>
+              <p>اختر عميلاً من الجدول لعرض ملخص سريع هنا.</p>
+            </aside>
+          </div>
+        </section>
+
+        <section id="requestsPage" class="admin-page hidden">
+          <div class="toolbar card">
+            <label>
+              <span>بحث</span>
+              <input id="requestSearch" type="search" placeholder="عميل، قاعة، باقة" />
+            </label>
+            <label>
+              <span>حالة الطلب</span>
+              <select id="requestStatusFilter">
+                <option value="">كل الحالات</option>
+                <option value="pending">قيد المراجعة</option>
+                <option value="approved">موافق عليه</option>
+                <option value="active">نشط</option>
+                <option value="rejected">مرفوض</option>
+                <option value="expired">منتهي</option>
+              </select>
+            </label>
+            <label>
+              <span>حالة الدفع</span>
+              <select id="paymentStatusFilter">
+                <option value="">كل الحالات</option>
+                <option value="not_paid">غير مدفوع</option>
+                <option value="partially_paid">مدفوع جزئياً</option>
+                <option value="fully_paid">مدفوع بالكامل</option>
+              </select>
+            </label>
+          </div>
+          <article class="card table-card requests-table-card">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>العميل</th>
+                    <th>القاعة</th>
+                    <th>الباقة</th>
+                    <th>عدد الضيوف</th>
+                    <th>السعر</th>
+                    <th>حالة الطلب</th>
+                    <th>حالة الدفع</th>
+                    <th>تاريخ الطلب</th>
+                    <th>إجراءات</th>
+                  </tr>
+                </thead>
+                <tbody id="requestsTable"></tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+      </section>
+    </main>
+
+    <script type="module" src="./admin.js"></script>
+  </body>
+</html>

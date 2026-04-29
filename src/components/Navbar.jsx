@@ -54,9 +54,9 @@ const Navbar = () => {
             
             {user ? (
               <div className="flex items-center gap-4">
-                <Link to="/dashboard" className="text-primary hover:text-[#004242] transition-colors">
+                <a href="/dashboard/index.html" className="text-primary hover:text-[#004242] transition-colors">
                   لوحة التحكم
-                </Link>
+                </a>
                 <button
                   onClick={handleLogout}
                   className="text-red-500 hover:text-red-700 transition-colors"
@@ -66,15 +66,15 @@ const Navbar = () => {
               </div>
             ) : (
               <div className="flex items-center gap-4">
-                <Link to="/login" className="text-primary hover:text-[#004242] transition-colors">
+                <a href="/login/index.html" className="text-primary hover:text-[#004242] transition-colors">
                   تسجيل الدخول
-                </Link>
-                <Link
-                  to="/register"
+                </a>
+                <a
+                  href="/register/index.html"
                   className="bg-primary text-white px-5 lg:px-6 py-2 rounded-full hover:bg-primary-dark transition-all"
                 >
                   إنشاء حساب
-                </Link>
+                </a>
               </div>
             )}
           </div>
@@ -97,13 +97,13 @@ const Navbar = () => {
             ))}
             {user ? (
               <>
-                <Link to="/dashboard" className="block py-2 px-4 text-primary hover:bg-gray-50">لوحة التحكم</Link>
+                <a href="/dashboard/index.html" className="block py-2 px-4 text-primary hover:bg-gray-50">لوحة التحكم</a>
                 <button onClick={handleLogout} className="block w-full text-right py-2 px-4 text-red-500 hover:bg-gray-50">تسجيل الخروج</button>
               </>
             ) : (
               <>
-                <Link to="/login" className="block py-2 px-4 text-primary hover:bg-gray-50">تسجيل الدخول</Link>
-                <Link to="/register" className="block py-2 px-4 bg-primary text-white mx-4 rounded-lg text-center">إنشاء حساب</Link>
+                <a href="/login/index.html" className="block py-2 px-4 text-primary hover:bg-gray-50">تسجيل الدخول</a>
+                <a href="/register/index.html" className="block py-2 px-4 bg-primary text-white mx-4 rounded-lg text-center">إنشاء حساب</a>
               </>
             )}
           </div>
