@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Event Staff | Gaiah</title>
+    <link rel="stylesheet" href="/shared/gaiah-ui.css" />
+    <link rel="stylesheet" href="./staff.css" />
+  </head>
+  <body>
+    <main id="staffApp" class="staff-shell">
+      <section id="staffLoginView" class="staff-login-view">
+        <article class="staff-login-card">
+          <div class="staff-login-header">
+            <p class="staff-kicker">Gaiah Staff</p>
+            <h1>Event staff sign in</h1>
+            <p>Use the account provided by the event owner.</p>
+          </div>
+
+          <div id="staffMessage" class="staff-message hidden" role="status"></div>
+
+          <form id="staffLoginForm" class="staff-form" novalidate>
+            <label class="staff-field" for="staffEmailInput">
+              <span>Email</span>
+              <input id="staffEmailInput" type="email" autocomplete="email" />
+            </label>
+
+            <label class="staff-field" for="staffPasswordInput">
+              <span>Password</span>
+              <input id="staffPasswordInput" type="password" autocomplete="current-password" />
+            </label>
+
+            <button id="staffLoginButton" class="staff-button" type="submit">Sign in</button>
+          </form>
+
+          <p class="staff-helper-text">Staff access is limited to the assigned event.</p>
+        </article>
+      </section>
+
+      <section id="staffDashboardView" class="staff-dashboard hidden">
+        <header class="staff-header">
+          <div>
+            <p class="staff-brand">Gaiah Staff</p>
+            <h1 id="staffNameLabel">Staff Member</h1>
+          </div>
+          <button id="staffSignOutButton" class="staff-secondary-button" type="button">Sign out</button>
+        </header>
+
+        <div id="staffDashboardMessage" class="staff-message hidden" role="status"></div>
+
+        <article class="staff-event-card">
+          <div>
+            <p class="staff-kicker">Assigned event</p>
+            <h2 id="staffEventName">Event name</h2>
+          </div>
+          <dl class="staff-event-meta">
+            <div>
+              <dt>Date</dt>
+              <dd id="staffEventDate">Event date</dd>
+            </div>
+            <div>
+              <dt>Time</dt>
+              <dd id="staffEventTime">Event time</dd>
+            </div>
+            <div>
+              <dt>Location</dt>
+              <dd id="staffEventLocation">Event location</dd>
+            </div>
+            <div>
+              <dt>Role</dt>
+              <dd id="staffRoleLabel">Entry Organizer</dd>
+            </div>
+          </dl>
+        </article>
+
+        <section class="staff-stats-grid" aria-label="Event attendance statistics">
+          <article class="staff-stat-card">
+            <span>Total guests</span>
+            <strong id="staffTotalGuests">0</strong>
+          </article>
+          <article class="staff-stat-card">
+            <span>Arrived</span>
+            <strong id="staffArrivedCount">0</strong>
+          </article>
+          <article class="staff-stat-card">
+            <span>Not arrived</span>
+            <strong id="staffNotArrivedCount">0</strong>
+          </article>
+          <article class="staff-stat-card">
+            <span>Re-entry pending</span>
+            <strong id="staffReEntryPendingCount">0</strong>
+          </article>
+        </section>
+
+        <article id="staffScannerWorkspace" class="staff-scanner-card">
+          <div class="staff-section-heading">
+            <h2>Scanner</h2>
+            <p>Scan a guest QR code or paste the QR payload for testing.</p>
+          </div>
+          <div class="scanner-mode-tabs" role="tablist" aria-label="Scanner mode">
+            <button class="scanner-mode-button" type="button" data-scanner-mode="camera">Camera scanner</button>
+            <button class="scanner-mode-button" type="button" data-scanner-mode="manual">Manual input</button>
+          </div>
+          <div id="scannerPanels"></div>
+          <div id="scanResultPanel"></div>
+        </article>
+
+        <article class="staff-toggle-card">
+          <label class="staff-toggle-row" for="autoConfirmToggle">
+            <input id="autoConfirmToggle" type="checkbox" />
+            <span>Auto-confirm arrival after successful scan</span>
+          </label>
+          <p>When enabled, a valid backend scan will mark the guest as arrived automatically. When disabled, staff must confirm manually.</p>
+        </article>
+
+        <article class="staff-arrivals-card">
+          <div class="staff-section-heading">
+            <h2>Arrived guests</h2>
+            <p>Recent arrivals will appear here after scanner verification is connected.</p>
+          </div>
+          <label class="staff-field staff-search-field" for="arrivedGuestSearchInput">
+            <span>Search arrived guests</span>
+            <input id="arrivedGuestSearchInput" type="search" placeholder="Search by guest name" />
+          </label>
+          <div id="arrivedGuestsList" class="staff-arrivals-list"></div>
+        </article>
+
+        <article id="rejectionReasonsCard" class="staff-rejection-card">
+          <div class="staff-section-heading">
+            <h2>Possible rejection reasons</h2>
+            <p>Backend verification will decide the final scan result in a later stage.</p>
+          </div>
+          <ul id="rejectionReasonsList"></ul>
+        </article>
+      </section>
+    </main>
+
+    <script type="module" src="./staff.js"></script>
+  </body>
+</html>

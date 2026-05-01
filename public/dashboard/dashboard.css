@@ -420,7 +420,7 @@
 
 .event-list-item {
   display: grid;
-  grid-template-columns: minmax(220px, 1.2fr) minmax(220px, 1fr) auto;
+  grid-template-columns: minmax(220px, 1.2fr) minmax(220px, 1fr) auto auto;
   gap: 14px;
   align-items: center;
   padding: 14px;
@@ -453,6 +453,17 @@
   border: 1px solid var(--gaiah-border);
   border-radius: 9px;
   background: #f8fbfb;
+}
+
+.event-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.event-manage-link {
+  min-height: 34px;
+  padding: 7px 12px;
+  white-space: nowrap;
 }
 
 .create-event-panel {

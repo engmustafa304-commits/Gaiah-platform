@@ -1,0 +1,250 @@
+success  
+now lets go back to events page to mange the events in details 
+so we will build an event details page 
+in this page the user will create guests lists 
+each guest lit can have different invitation card design and different invitation text 
+for the guest list the client must provide all guests WhatsApp umbers and there names 
+each guest list will have a unique URL ( they can fill an excel template or manually fill one by one ) remind them to use there formal names as we will address them with the provided name 
+then the client will share this URL with his  guests 
+the guest must open this link and insert his WhatsApp number to verify his invitation against the provided WhatsApp numbers list , if the gust is on the list we welcome him by his name and show him the selected invitation ( it can be an image and can be a video )
+ask him to accept or decline the invitation  
+if he accepts we create a unique QR code only for this gust that will be verified at the event location by the event staff ( we will build there UI later ) 
+
+
+lets stage it 
+1A build the event details page 
+1B build the guests lists tabs it will be in tables each table will show max of 50 rows and then the user will have to go to next page of the table 
+1C the user can mange the guest list any time, add remove and edit gusts and numbers ( show each gust status  in his row  ( invitation sent , accepted or declined , arrived or not arrived ,unknown )  
+1D choosing the invitation media from catalogue ( images and videos  keep it dummy for now  )  
+1E we write the back end for the event details page and all its functions 
+><><><><><><><><><><><><><><><><><>
+1E-A: Backend read/data model foundation
+1E-B: Backend guest list + guest write functions
+1E-C: Backend invitation design persistence
+1F-A: Wire guest list reads/pagination
+1F-B: Wire add/edit/revoke guests
+1F-C: Wire invitation design selection
+><><><><><><><><><><><><><><><><>
+1F wire the UI to the functions 
+
+2A work on the URL creation and sharing 
+2B build the invitation page that will interact with the gust 
+2C write the back end functions 
+2D wire them 
+
+3A create event staff accounts creation UI to the event details page 
+3B build the event staff page to verify the invitations 
+3C write the back end functions 
+3D wire them 
+><><><>><><><>><><><>><><>>><><><><><><><><
+Important decision before Stage 3
+
+Staff accounts should be real Firebase Auth users, but they must not be normal clients and must not access any other event.
+
+The staff account model should be:
+
+users/{staffUid}
+role: "event_staff"
+accountStatus: "active"
+
+And the event assignment should be:
+
+events/{eventId}/staff/{staffUid}
+uid
+eventId
+clientUid
+fullName
+mobile
+sex
+position
+customPosition
+email
+staffStatus: "active" | "disabled"
+createdAt
+updatedAt
+
+The staff should only access /staff, and every backend function must check:
+
+Is this authenticated user assigned to this exact event?
+Is staffStatus active?
+Is the event still valid?
+
+No staff member should be able to read another event, even if it belongs to the same client.
+
+I would adjust your Stage 3 split slightly
+
+Your direction is correct, but I would stage it like this:
+
+3A — Event staff accounts UI tab only
+
+Inside the Event Details page, add a new tab: Staff.
+
+The client can create staff accounts with:
+
+Name
+Mobile number
+Sex
+Position
+Email
+Password
+
+Positions:
+
+General Supervisor
+Security Guard
+Entry Organizer
+Other
+
+For “Other”, show a custom position field.
+
+This stage is UI only. No backend yet.
+
+3B — Staff /staff page login scaffold only
+
+Build:
+
+/staff/index.html
+
+It has:
+
+Login screen
+Basic staff shell
+Event details card
+Arrived guests list placeholder
+Scanner area placeholder
+Manual/auto confirmation toggle placeholder
+
+No backend yet.
+
+3C — Staff scanner UI components only
+
+Still frontend only.
+
+Add:
+
+Camera scanner UI placeholder
+Manual QR payload input for testing
+Scan result panel
+Auto confirm toggle
+Confirm arrival button
+Mark guest leaving / will return button
+Rejected reason panel
+
+We can use manual QR input first, then add camera QR scanner after the backend is stable. Camera scanning can be messy on mobile browsers, so manual QR payload testing is the safer first pass.
+
+3D — Backend functions: staff account management
+
+This is where staff accounts are actually created.
+
+Functions:
+
+createEventStaffAccount
+listEventStaff
+updateEventStaffAccount
+disableEventStaffAccount
+
+This backend must use Firebase Admin SDK to create staff Auth users. Do not create staff accounts from the frontend with normal Firebase Auth signup, because that can interfere with the currently logged-in client session.
+
+3E — Backend functions: staff event access + QR verification
+
+Functions:
+
+getMyStaffEventWorkspace
+verifyEventGuestQr
+confirmGuestArrival
+markGuestWillReturn
+
+Core rules:
+
+QR must belong to the same event.
+Guest must be accepted.
+Guest must not be revoked.
+QR pass must be active.
+If guest is already arrived, reject unless status is will_return.
+If valid, mark arrived.
+Store arrival time and staff UID.
+
+Guest status flow should become:
+
+accepted
+arrived
+will_return
+arrived_again
+revoked
+declined
+
+But we can keep the existing invitationStatus simple and add dedicated fields:
+
+attendanceStatus: "not_arrived" | "arrived" | "will_return"
+arrivalCount
+lastArrivedAt
+lastExitMarkedAt
+lastScannedBy
+
+This is cleaner than overloading invitationStatus.
+
+3F — Wire staff account UI to backend
+
+Wire Event Details Staff tab to:
+
+createEventStaffAccount
+listEventStaff
+disableEventStaffAccount
+3G — Wire /staff page to backend
+
+Wire staff login and scanner page to:
+
+getMyStaffEventWorkspace
+verifyEventGuestQr
+confirmGuestArrival
+markGuestWillReturn
+About “QR invalid after arrival”
+
+Yes. After a successful arrival scan:
+
+attendanceStatus = "arrived"
+
+If the same QR is scanned again, backend should reject with:
+
+Already arrived
+
+If staff marks guest as “will return”:
+
+attendanceStatus = "will_return"
+
+Then when QR is scanned again, backend allows entry and changes back to:
+
+attendanceStatus = "arrived"
+arrivalCount += 1
+
+That gives you a clean re-entry model.
+
+Rejection reasons
+
+The staff page should show clear rejection reasons:
+
+QR does not belong to this event
+Invitation was revoked
+Guest declined
+Guest has not accepted invitation
+Guest already arrived
+QR pass inactive
+Invitation link disabled
+Invalid QR format
+Staff account not assigned to this event
+My recommendation
+
+Yes, proceed to Stage 3, but do not jump straight into backend. Start with:
+
+3A: Event staff accounts UI tab only
+
+Then:
+
+3B: Staff /staff login scaffold only
+3C: Staff scanner UI components only
+3D: Backend staff account management
+3E: Backend QR verification and attendance logic
+3F: Wire client staff tab
+3G: Wire staff scanner page
+
+><><><><><><><><><><><><><><><><><><><>><><

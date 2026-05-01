@@ -596,6 +596,7 @@ function renderRelatedEvents(relatedEvents) {
       <span class="status-badge ${event.eventStatus === 'active' ? 'badge-active' : 'badge-expired'}">
         ${event.eventStatus === 'active' ? 'نشطة' : event.eventStatus === 'completed' ? 'مكتملة' : 'ملغية'}
       </span>
+      ${event.id ? `<a class="btn btn-secondary event-manage-link" href="/event-details/index.html?eventId=${encodeURIComponent(event.id)}">إدارة المناسبة</a>` : ''}
     </article>
   `).join('');
 }
@@ -732,6 +733,11 @@ function renderEventSummary() {
 
 function renderEventsList() {
   const eventsList = qs('#eventsList');
+  const eventsHint = eventsList?.closest('.card')?.querySelector('.section-hint');
+
+  if (eventsHint) {
+    eventsHint.textContent = 'المناسبات التي أنشأتها من لوحة التحكم';
+  }
 
   if (eventsLoading) {
     eventsList.innerHTML = '<article class="card empty-state inline-empty"><h2>جار تحميل بيانات المناسبات...</h2></article>';
@@ -771,6 +777,11 @@ function renderEventsList() {
       <span class="status-badge ${event.eventStatus === 'active' ? 'badge-active' : 'badge-expired'}">
         ${event.eventStatus === 'active' ? 'نشطة' : event.eventStatus === 'completed' ? 'مكتملة' : 'ملغية'}
       </span>
+      <div class="event-actions">
+        ${event.id
+          ? `<a class="btn btn-secondary event-manage-link" href="/event-details/index.html?eventId=${encodeURIComponent(event.id)}">إدارة المناسبة</a>`
+          : '<button class="btn btn-secondary event-manage-link" type="button" disabled>إدارة المناسبة</button>'}
+      </div>
     </article>
   `).join('');
 }

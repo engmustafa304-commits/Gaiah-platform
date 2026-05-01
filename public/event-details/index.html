@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>إدارة المناسبة | جيّة</title>
+    <link rel="stylesheet" href="/shared/gaiah-ui.css" />
+    <link rel="stylesheet" href="./event-details.css" />
+  </head>
+  <body>
+    <main id="eventDetailsApp" class="event-details-shell">
+      <header class="event-details-topbar">
+        <a class="back-link" href="/dashboard/index.html#events">العودة للمناسبات</a>
+        <a class="event-brand" href="/">جيّة</a>
+        <h1>إدارة المناسبة</h1>
+      </header>
+
+      <section id="eventDetailsState" class="card event-state">
+        <h2>جار تحميل تفاصيل المناسبة...</h2>
+        <p>يتم التحقق من تسجيل الدخول وجلب بيانات المناسبة.</p>
+        <div id="eventStateActions" class="state-actions hidden"></div>
+      </section>
+
+      <section id="eventWorkspace" class="event-workspace hidden">
+        <article id="eventSummaryCard" class="card event-summary-card"></article>
+
+        <nav id="eventDetailsTabs" class="event-tabs" aria-label="أقسام إدارة المناسبة">
+          <button class="event-tab active" type="button" data-tab="overview">نظرة عامة</button>
+          <button class="event-tab" type="button" data-tab="guest-lists">قوائم الضيوف</button>
+          <button class="event-tab" type="button" data-tab="invitation-design">الدعوة والتصميم</button>
+          <button class="event-tab" type="button" data-tab="invitation-links">روابط الدعوة</button>
+          <button class="event-tab" type="button" data-tab="event-staff">Event Staff</button>
+          <button class="event-tab" type="button" data-tab="verification">التحقق والحضور</button>
+        </nav>
+
+        <section id="overviewTab" class="tab-panel" data-tab-panel="overview">
+          <div class="section-title">
+            <span>تخصيص رصيد الدعوات</span>
+          </div>
+          <div id="eventAllocationsList" class="allocation-list"></div>
+          <article class="card placeholder-card">
+            <h2>ملخص الضيوف والردود</h2>
+            <p>سيتم عرض ملخص قوائم الضيوف والردود بعد تفعيل إدارة الضيوف.</p>
+          </article>
+        </section>
+
+        <section id="guestListsTab" class="tab-panel hidden" data-tab-panel="guest-lists">
+          <article class="card guest-lists-header">
+            <div>
+              <h2>قوائم الضيوف</h2>
+              <p>يمكنك لاحقاً إنشاء أكثر من قائمة ضيوف، وكل قائمة سيكون لها رابط دعوة وتصميم ونص خاص بها.</p>
+              <p class="manual-note">سيقوم العميل بنسخ رابط القائمة وإرساله للضيوف بنفسه من هاتفه.</p>
+            </div>
+            <div class="guest-toolbar">
+              <button id="addGuestButton" class="btn btn-gradient" type="button">إضافة ضيف</button>
+              <button id="bulkAddGuestsButton" class="btn btn-secondary" type="button">إضافة متعددة</button>
+              <button id="importGuestsButton" class="btn btn-secondary" type="button">استيراد من Excel</button>
+              <button id="guestListPlaceholderButton" class="btn btn-secondary" type="button">إنشاء قائمة ضيوف</button>
+            </div>
+          </article>
+
+          <nav id="guestListTabs" class="guest-list-tabs" aria-label="قوائم الضيوف"></nav>
+
+          <section id="guestListSummary" class="guest-list-summary"></section>
+
+          <article class="card guest-table-card">
+            <div class="section-title">
+              <span>الضيوف</span>
+              <span class="section-hint">تعرض هذه القائمة بحد أقصى 50 ضيفاً في كل صفحة</span>
+            </div>
+            <div id="guestTableContainer" class="guest-table-container"></div>
+            <div id="guestTablePagination" class="guest-pagination"></div>
+          </article>
+        </section>
+
+        <section id="invitationDesignTab" class="tab-panel hidden" data-tab-panel="invitation-design">
+          <article class="card design-header-card">
+            <h2>الدعوة والتصميم</h2>
+            <p>اختر تصميم الدعوة ونص الدعوة لكل قائمة ضيوف. في هذه المرحلة الاختيارات للمعاينة فقط.</p>
+          </article>
+
+          <section class="design-workspace-grid">
+            <div class="design-editor-column">
+              <article class="card design-control-card">
+                <div class="form-field">
+                  <label for="designGuestListSelect">قائمة الضيوف</label>
+                  <select id="designGuestListSelect"></select>
+                </div>
+
+                <div class="form-field">
+                  <label for="invitationTextInput">نص الدعوة</label>
+                  <textarea
+                    id="invitationTextInput"
+                    rows="5"
+                    placeholder="اكتب نص الدعوة الذي سيظهر للضيوف عند فتح الرابط."
+                  ></textarea>
+                  <p class="field-helper">سيتم مخاطبة الضيف بالاسم المسجل في قائمة الضيوف، لذلك تأكد من كتابة الأسماء الرسمية.</p>
+                </div>
+
+                <div id="mediaCatalogueFilters" class="media-filter-group" aria-label="تصفية التصاميم">
+                  <button class="media-filter-button active" type="button" data-media-filter="all">الكل</button>
+                  <button class="media-filter-button" type="button" data-media-filter="image">صور</button>
+                  <button class="media-filter-button" type="button" data-media-filter="video">فيديو</button>
+                </div>
+              </article>
+
+              <article class="card media-catalogue-card">
+                <div class="section-title">
+                  <span>كتالوج التصاميم</span>
+                  <span class="section-hint">نماذج تجريبية فقط</span>
+                </div>
+                <div id="mediaCatalogue" class="media-catalogue"></div>
+              </article>
+            </div>
+
+            <aside class="design-preview-column">
+              <article id="invitationPreview" class="card invitation-preview-card"></article>
+              <button id="applyInvitationDesignButton" class="btn btn-gradient" type="button">تطبيق على القائمة</button>
+            </aside>
+          </section>
+        </section>
+
+        <section id="invitationLinksTab" class="tab-panel hidden" data-tab-panel="invitation-links">
+          <article class="card share-header-card">
+            <h2>روابط الدعوة</h2>
+            <p>لكل قائمة ضيوف سيكون هناك رابط دعوة خاص. في هذه المرحلة سيتم تجهيز واجهة النسخ والمشاركة، وسيتم تفعيل الرابط الحقيقي بعد ربط مرحلة الدعوات العامة.</p>
+            <p class="manual-note">انسخ الرابط وأرسله للضيوف من هاتفك الشخصي أو عبر واتساب بنفسك.</p>
+          </article>
+
+          <section class="share-workspace-grid">
+            <div class="share-main-column">
+              <article class="card share-selector-card">
+                <div class="form-field">
+                  <label for="shareGuestListSelect">قائمة الضيوف</label>
+                  <select id="shareGuestListSelect"></select>
+                </div>
+              </article>
+
+              <article id="shareGuestListStatus" class="card share-status-card"></article>
+            </div>
+
+            <aside class="share-side-column">
+              <article id="shareUrlCard" class="card share-url-card"></article>
+
+              <article class="card share-instructions-card">
+                <h3>طريقة المشاركة</h3>
+                <ol>
+                  <li>جهز قائمة الضيوف وأرقام الواتساب.</li>
+                  <li>اختر تصميم الدعوة ونص الدعوة.</li>
+                  <li>بعد تفعيل الرابط، انسخه وأرسله للضيوف من هاتفك.</li>
+                  <li>سيقوم الضيف بإدخال رقم الواتساب للتحقق من الدعوة.</li>
+                </ol>
+              </article>
+
+              <article class="card future-flow-card">
+                <h3>ما سيحدث للضيف لاحقاً</h3>
+                <p>فتح الرابط → إدخال رقم الواتساب → عرض الدعوة → قبول أو اعتذار → إصدار QR عند القبول</p>
+              </article>
+            </aside>
+          </section>
+        </section>
+
+        <section id="verificationTab" class="tab-panel hidden" data-tab-panel="verification">
+          <article class="card verification-header-card">
+            <div>
+              <span class="eyebrow">التحقق والحضور</span>
+              <h2>إحصائيات الحضور</h2>
+              <p>تعرض هذه الصفحة ملخصاً رقمياً لحالة الدعوات والحضور لهذه المناسبة.</p>
+            </div>
+            <span class="verification-stage-badge">قيد الربط</span>
+          </article>
+
+          <section id="attendanceStatsGrid" class="attendance-stats-grid" aria-label="إحصائيات التحقق والحضور">
+            <article class="card attendance-stat-card">
+              <span>إجمالي الضيوف</span>
+              <strong data-attendance-stat="totalGuests">0</strong>
+            </article>
+            <article class="card attendance-stat-card">
+              <span>قبلوا الدعوة</span>
+              <strong data-attendance-stat="accepted">0</strong>
+            </article>
+            <article class="card attendance-stat-card">
+              <span>اعتذروا</span>
+              <strong data-attendance-stat="declined">0</strong>
+            </article>
+            <article class="card attendance-stat-card">
+              <span>رموز QR المصدرة</span>
+              <strong data-attendance-stat="qrIssued">0</strong>
+            </article>
+            <article class="card attendance-stat-card">
+              <span>الحضور المسجل</span>
+              <strong data-attendance-stat="arrived">0</strong>
+            </article>
+            <article class="card attendance-stat-card">
+              <span>لم يصلوا بعد</span>
+              <strong data-attendance-stat="notArrived">0</strong>
+            </article>
+            <article class="card attendance-stat-card">
+              <span>بانتظار العودة</span>
+              <strong data-attendance-stat="willReturn">0</strong>
+            </article>
+            <article class="card attendance-stat-card">
+              <span>الدعوات الملغاة</span>
+              <strong data-attendance-stat="revoked">0</strong>
+            </article>
+          </section>
+
+          <div id="attendanceSummaryStatus" class="attendance-summary-status">
+            سيتم تحميل الإحصائيات عند فتح هذا القسم.
+          </div>
+
+          <article class="card verification-note-card">
+            <h3>ملاحظة</h3>
+            <p>سيتم ربط هذه الأرقام ببيانات الحضور الفعلية في المرحلة التالية.</p>
+          </article>
+        </section>
+
+        <section id="eventStaffTab" class="tab-panel hidden" data-tab-panel="event-staff">
+          <article class="card staff-header-card">
+            <h2>Event Staff</h2>
+            <p>Create staff accounts for this event. Staff access is limited to this event only.</p>
+            <p class="staff-stage-note">Staff accounts are created securely from the backend and can log in from /staff.</p>
+          </article>
+
+          <section class="staff-workspace-grid">
+            <article class="card staff-form-card">
+              <h3>Add Staff Account</h3>
+              <div class="staff-form-grid">
+                <label class="form-field" for="staffFullNameInput">
+                  <span>Full name</span>
+                  <input id="staffFullNameInput" type="text" autocomplete="name" />
+                </label>
+                <label class="form-field" for="staffMobileInput">
+                  <span>Mobile number</span>
+                  <input id="staffMobileInput" type="tel" autocomplete="tel" />
+                </label>
+                <label class="form-field" for="staffSexSelect">
+                  <span>Sex</span>
+                  <select id="staffSexSelect">
+                    <option value="">Select sex</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                  </select>
+                </label>
+                <label class="form-field" for="staffPositionSelect">
+                  <span>Position</span>
+                  <select id="staffPositionSelect">
+                    <option value="">Select position</option>
+                    <option value="general_supervisor">General Supervisor</option>
+                    <option value="security_guard">Security Guard</option>
+                    <option value="entry_organizer">Entry Organizer</option>
+                    <option value="other">Other</option>
+                  </select>
+                </label>
+                <label id="staffCustomPositionField" class="form-field hidden" for="staffCustomPositionInput">
+                  <span>Custom position</span>
+                  <input id="staffCustomPositionInput" type="text" />
+                </label>
+                <label class="form-field" for="staffEmailInput">
+                  <span>Email</span>
+                  <input id="staffEmailInput" type="email" autocomplete="email" />
+                </label>
+                <label class="form-field" for="staffPasswordInput">
+                  <span>Password</span>
+                  <input id="staffPasswordInput" type="password" autocomplete="new-password" />
+                </label>
+              </div>
+              <div id="staffFormAlert" class="guest-form-alert hidden"></div>
+              <div class="staff-form-actions">
+                <button id="addStaffAccountButton" class="btn btn-gradient" type="button">Add Staff Account</button>
+                <button id="resetStaffFormButton" class="btn btn-secondary" type="button">Reset</button>
+              </div>
+            </article>
+
+            <article class="card staff-scope-card">
+              <h3>Staff access scope</h3>
+              <ul>
+                <li>Each staff account will be assigned to this event only.</li>
+                <li>Staff will later use /staff to log in and scan guest QR codes.</li>
+                <li>Staff cannot access other events.</li>
+              </ul>
+            </article>
+          </section>
+
+            <article class="card staff-list-card">
+              <div class="staff-list-header">
+                <h3>Staff accounts</h3>
+                <span>Backend managed</span>
+              </div>
+              <div id="staffPreviewTable"></div>
+            </article>
+        </section>
+
+        <div id="placeholderMessage" class="placeholder-message hidden"></div>
+      </section>
+
+      <section id="guestFormModal" class="guest-modal hidden" aria-modal="true" role="dialog" aria-labelledby="guestFormTitle">
+        <div class="guest-modal-backdrop" data-close-guest-modal></div>
+        <article class="card guest-modal-card">
+          <div class="guest-modal-header">
+            <div>
+              <span class="eyebrow">إدارة الضيوف</span>
+              <h2 id="guestFormTitle">إضافة ضيف</h2>
+            </div>
+            <button class="modal-close-button" type="button" data-close-guest-modal>إغلاق</button>
+          </div>
+          <form id="guestForm" class="guest-form" novalidate>
+            <div class="form-field guest-form-text-field">
+              <label for="guestName">اسم الضيف</label>
+              <input id="guestName" name="guestName" type="text" required />
+            </div>
+            <div class="form-field guest-form-text-field">
+              <label for="guestWhatsapp">رقم الواتساب</label>
+              <input id="guestWhatsapp" name="guestWhatsapp" type="text" required />
+            </div>
+            <div class="form-field">
+              <label for="guestStatus">حالة الدعوة</label>
+              <select id="guestStatus" name="guestStatus">
+                <option value="unknown">غير معروف</option>
+                <option value="invitation_sent">تم إرسال الدعوة</option>
+                <option value="accepted">قبل الدعوة</option>
+                <option value="declined">اعتذر</option>
+                <option value="arrived">وصل</option>
+                <option value="not_arrived">لم يصل</option>
+                <option value="revoked">ملغي</option>
+              </select>
+            </div>
+            <div id="guestFormAlert" class="guest-form-alert hidden"></div>
+            <div class="guest-form-actions">
+              <button class="btn btn-gradient" type="submit">حفظ</button>
+              <button class="btn btn-secondary" type="button" data-close-guest-modal>إلغاء</button>
+            </div>
+          </form>
+        </article>
+      </section>
+
+      <section id="bulkGuestModal" class="guest-modal hidden" aria-modal="true" role="dialog" aria-labelledby="bulkGuestTitle">
+        <div class="guest-modal-backdrop" data-close-bulk-guest-modal></div>
+        <article class="card guest-modal-card bulk-guest-modal-card manual-bulk-guest-modal-card">
+          <div class="guest-modal-header">
+            <div>
+              <span class="eyebrow">إدارة الضيوف</span>
+              <h2 id="bulkGuestTitle">إضافة ضيوف متعددة</h2>
+              <p>يمكنك إضافة حتى 60 ضيفاً يدوياً في كل دفعة. سيتم حفظ الضيوف بالحالة الافتراضية: غير معروف.</p>
+            </div>
+            <button class="modal-close-button" type="button" data-close-bulk-guest-modal>إغلاق</button>
+          </div>
+          <div id="bulkCapacitySummary" class="capacity-summary"></div>
+          <div id="bulkGuestAlert" class="guest-form-alert hidden"></div>
+          <div id="bulkGuestRowsContainer" class="bulk-guest-rows-container"></div>
+          <div id="bulkGuestPagination" class="bulk-guest-pagination"></div>
+          <div class="guest-form-actions">
+            <button id="saveBulkGuestsButton" class="btn btn-gradient" type="button">حفظ الضيوف</button>
+            <button class="btn btn-secondary" type="button" data-close-bulk-guest-modal>إلغاء</button>
+          </div>
+        </article>
+      </section>
+
+      <section id="excelGuestModal" class="guest-modal hidden" aria-modal="true" role="dialog" aria-labelledby="excelGuestTitle">
+        <div class="guest-modal-backdrop" data-close-excel-guest-modal></div>
+        <article class="card guest-modal-card bulk-guest-modal-card">
+          <div class="guest-modal-header">
+            <div>
+              <span class="eyebrow">استيراد الضيوف</span>
+              <h2 id="excelGuestTitle">استيراد الضيوف من Excel</h2>
+              <p>حمّل القالب، املأ اسم الضيف ورقم الواتساب، ثم ارفع الملف. الحد الأقصى 200 ضيف في كل ملف.</p>
+            </div>
+            <button class="modal-close-button" type="button" data-close-excel-guest-modal>إغلاق</button>
+          </div>
+          <div id="excelCapacitySummary" class="capacity-summary"></div>
+          <div class="excel-upload-actions">
+            <button id="downloadGuestTemplateButton" class="btn btn-secondary" type="button">تحميل قالب Excel</button>
+            <label class="excel-file-label" for="guestExcelFileInput">
+              <span>اختر ملف Excel أو CSV</span>
+              <input id="guestExcelFileInput" type="file" accept=".xlsx,.xls,.csv" />
+            </label>
+          </div>
+          <div id="excelGuestAlert" class="guest-form-alert hidden"></div>
+          <div id="excelGuestPreview" class="excel-guest-preview"></div>
+          <div class="guest-form-actions">
+            <button id="submitExcelGuestsButton" class="btn btn-gradient" type="button">رفع الضيوف</button>
+            <button class="btn btn-secondary" type="button" data-close-excel-guest-modal>إلغاء</button>
+          </div>
+        </article>
+      </section>
+
+      <section id="guestListFormModal" class="guest-modal hidden" aria-modal="true" role="dialog" aria-labelledby="guestListFormTitle">
+        <div class="guest-modal-backdrop" data-close-guest-list-modal></div>
+        <article class="card guest-modal-card">
+          <div class="guest-modal-header">
+            <div>
+              <span class="eyebrow">قوائم الضيوف</span>
+              <h2 id="guestListFormTitle">إنشاء قائمة ضيوف</h2>
+            </div>
+            <button class="modal-close-button" type="button" data-close-guest-list-modal>إغلاق</button>
+          </div>
+          <form id="guestListForm" class="guest-form" novalidate>
+            <div class="form-field">
+              <label for="guestListName">اسم القائمة</label>
+              <input id="guestListName" name="guestListName" type="text" required />
+            </div>
+            <div class="form-field">
+              <label for="guestListInvitationTitle">عنوان الدعوة</label>
+              <input id="guestListInvitationTitle" name="guestListInvitationTitle" type="text" />
+            </div>
+            <div class="form-field">
+              <label for="guestListInvitationText">نص الدعوة</label>
+              <textarea
+                id="guestListInvitationText"
+                name="guestListInvitationText"
+                rows="4"
+                placeholder="يسرنا دعوتكم لحضور مناسبتنا، ونتطلع لمشاركتكم."
+              ></textarea>
+            </div>
+            <div id="guestListFormAlert" class="guest-form-alert hidden"></div>
+            <div class="guest-form-actions">
+              <button class="btn btn-gradient" type="submit">حفظ القائمة</button>
+              <button class="btn btn-secondary" type="button" data-close-guest-list-modal>إلغاء</button>
+            </div>
+          </form>
+        </article>
+      </section>
+    </main>
+
+    <script type="module" src="./event-details.js"></script>
+  </body>
+</html>

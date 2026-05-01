@@ -71,6 +71,114 @@ export function getMyEventDetails(eventId) {
   return callFunction('getMyEventDetails', { eventId });
 }
 
+export function getMyEventWorkspace(payload) {
+  return callFunction('getMyEventWorkspace', payload);
+}
+
+export function listMyEventGuestLists(payload) {
+  return callFunction('listMyEventGuestLists', payload);
+}
+
+export function getMyEventGuestListDetails(payload) {
+  return callFunction('getMyEventGuestListDetails', payload);
+}
+
+export function listMyEventGuests(payload) {
+  return callFunction('listMyEventGuests', payload);
+}
+
+export function createMyEventGuestList(payload) {
+  return callFunction('createMyEventGuestList', payload);
+}
+
+export function addGuestToList(payload) {
+  return callFunction('addGuestToList', payload);
+}
+
+export function bulkAddGuestsToList(payload) {
+  return callFunction('bulkAddGuestsToList', payload);
+}
+
+export function updateGuestInList(payload) {
+  return callFunction('updateGuestInList', payload);
+}
+
+export function updateGuestStatus(payload) {
+  return callFunction('updateGuestStatus', payload);
+}
+
+export function revokeGuest(payload) {
+  return callFunction('revokeGuest', payload);
+}
+
+export function listInvitationMediaCatalogue(filters = {}) {
+  return callFunction('listInvitationMediaCatalogue', filters);
+}
+
+export function updateGuestListInvitationDesign(payload) {
+  return callFunction('updateGuestListInvitationDesign', payload);
+}
+
+export function createGuestListInvitationLink(payload) {
+  return callFunction('createGuestListInvitationLink', payload);
+}
+
+export function getMyGuestListInvitationLink(payload) {
+  return callFunction('getMyGuestListInvitationLink', payload);
+}
+
+export function deactivateGuestListInvitationLink(payload) {
+  return callFunction('deactivateGuestListInvitationLink', payload);
+}
+
+export function getPublicInvitationByToken(payload) {
+  return callFunction('getPublicInvitationByToken', payload);
+}
+
+export function verifyPublicInvitationGuest(payload) {
+  return callFunction('verifyPublicInvitationGuest', payload);
+}
+
+export function submitPublicGuestRsvp(payload) {
+  return callFunction('submitPublicGuestRsvp', payload);
+}
+
+export function createEventStaffAccount(payload) {
+  return callFunction('createEventStaffAccount', payload);
+}
+
+export function listEventStaffAccounts(payload) {
+  return callFunction('listEventStaffAccounts', payload);
+}
+
+export function updateEventStaffAccount(payload) {
+  return callFunction('updateEventStaffAccount', payload);
+}
+
+export function disableEventStaffAccount(payload) {
+  return callFunction('disableEventStaffAccount', payload);
+}
+
+export function getMyStaffEventWorkspace(payload = {}) {
+  return callFunction('getMyStaffEventWorkspace', payload);
+}
+
+export function verifyEventGuestQr(payload) {
+  return callFunction('verifyEventGuestQr', payload);
+}
+
+export function confirmGuestArrival(payload) {
+  return callFunction('confirmGuestArrival', payload);
+}
+
+export function markGuestWillReturn(payload) {
+  return callFunction('markGuestWillReturn', payload);
+}
+
+export function getMyEventAttendanceSummary(payload) {
+  return callFunction('getMyEventAttendanceSummary', payload);
+}
+
 export function getMySubscriptionsOverview() {
   return callFunction('getMySubscriptionsOverview');
 }

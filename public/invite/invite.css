@@ -1,0 +1,387 @@
+.public-invite-shell {
+  min-height: 100vh;
+  padding: 14px;
+  background:
+    linear-gradient(180deg, rgba(58, 122, 122, 0.08), rgba(255, 255, 255, 0.72)),
+    #f7fbfb;
+  color: var(--gaiah-primary);
+}
+
+.invite-header {
+  width: min(720px, 100%);
+  margin: 0 auto 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--gaiah-medium);
+  font-size: 0.9rem;
+  font-weight: 850;
+}
+
+.invite-brand {
+  color: var(--gaiah-deep-teal);
+  font-size: 1.25rem;
+  font-weight: 950;
+  text-decoration: none;
+}
+
+.invite-state,
+.invite-content {
+  width: min(720px, 100%);
+  margin: 0 auto;
+}
+
+.invite-content {
+  display: grid;
+  gap: 10px;
+}
+
+.invite-card {
+  padding: 18px;
+  border: 1px solid var(--gaiah-border);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: var(--gaiah-shadow-lg);
+}
+
+.invite-kicker {
+  color: var(--gaiah-deep-teal);
+  font-size: 0.82rem;
+  font-weight: 950;
+}
+
+.invite-card h1,
+.invite-card h2 {
+  margin: 0;
+  color: var(--gaiah-primary);
+  line-height: 1.35;
+}
+
+.invite-muted,
+.invite-helper-note {
+  margin: 10px 0 0;
+  color: var(--gaiah-medium);
+  line-height: 1.8;
+  font-weight: 760;
+}
+
+.pass-warning {
+  padding: 12px;
+  border: 1px solid rgba(180, 83, 9, 0.18);
+  border-radius: 14px;
+  background: rgba(245, 158, 11, 0.08);
+  color: #92400e;
+}
+
+.verify-form {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.verify-form label {
+  color: var(--gaiah-primary);
+  font-size: 0.86rem;
+  font-weight: 900;
+}
+
+.verify-form input {
+  min-height: 52px;
+  padding: 12px 14px;
+  border: 1px solid var(--gaiah-border);
+  border-radius: 16px;
+  background: #fff;
+  color: var(--gaiah-primary);
+  direction: ltr;
+  text-align: left;
+  font: inherit;
+  font-size: 1.05rem;
+  font-weight: 850;
+}
+
+.verify-form input:focus {
+  border-color: rgba(58, 122, 122, 0.48);
+  outline: 4px solid rgba(58, 122, 122, 0.12);
+}
+
+.invite-primary-button,
+.invite-secondary-button {
+  min-height: 42px;
+  padding: 9px 13px;
+  border-radius: 13px;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 950;
+}
+
+.invite-primary-button {
+  border: 0;
+  background: var(--gaiah-deep-teal);
+  color: #fff;
+}
+
+.invite-secondary-button {
+  border: 1px solid var(--gaiah-border);
+  background: #fff;
+  color: var(--gaiah-primary);
+}
+
+.invite-primary-button:disabled,
+.invite-secondary-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+
+.invite-media {
+  margin: 8px -12px 10px;
+  overflow: hidden;
+  border: 1px solid rgba(18, 51, 51, 0.14);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.invite-media img {
+  display: block;
+  width: 100%;
+  max-height: min(76vh, 760px);
+  object-fit: contain;
+  background: #fff;
+}
+
+.invite-media video {
+  display: block;
+  width: 100%;
+  max-height: min(76vh, 760px);
+  background: #0f172a;
+}
+
+.invite-media-placeholder {
+  min-height: 260px;
+  display: grid;
+  place-items: center;
+  color: var(--gaiah-medium);
+  font-weight: 900;
+}
+
+.invitation-text {
+  margin: 0;
+  color: var(--gaiah-primary);
+  font-size: 0.96rem;
+  line-height: 1.85;
+  font-weight: 800;
+}
+
+.invite-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.compact-actions {
+  align-items: center;
+}
+
+.flip-control-button {
+  grid-column: 1 / -1;
+}
+
+.invitation-flip-card {
+  position: relative;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 18px;
+}
+
+.invitation-card-face {
+  display: none;
+  padding: 14px;
+  animation: inviteCardFade 180ms ease;
+}
+
+.invitation-flip-card[data-card-side="front"] .invitation-card-front,
+.invitation-flip-card[data-card-side="back"] .invitation-card-back {
+  display: grid;
+}
+
+.invitation-card-heading {
+  display: grid;
+  gap: 4px;
+}
+
+.invitation-card-heading h2 {
+  font-size: clamp(1.05rem, 4.5vw, 1.45rem);
+}
+
+.invitation-event-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 12px;
+  margin: 10px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid rgba(18, 51, 51, 0.08);
+}
+
+.invitation-event-meta div {
+  display: inline-flex;
+  gap: 4px;
+  align-items: baseline;
+  color: var(--gaiah-medium);
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.invitation-event-meta dt,
+.invitation-event-meta dd {
+  margin: 0;
+}
+
+.card-flip-icon {
+  position: absolute;
+  top: 10px;
+  inset-inline-end: 10px;
+  z-index: 3;
+  min-width: 38px;
+  min-height: 34px;
+  padding: 6px 9px;
+  border: 1px solid rgba(18, 51, 51, 0.14);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--gaiah-deep-teal);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 950;
+  box-shadow: 0 8px 20px rgba(18, 51, 51, 0.12);
+}
+
+@keyframes inviteCardFade {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.guest-pass-card {
+  text-align: center;
+  display: grid;
+  gap: 8px;
+}
+
+.real-qr-frame {
+  width: 224px;
+  height: 224px;
+  margin: 12px auto;
+  display: grid;
+  place-items: center;
+  padding: 10px;
+  border: 1px solid rgba(18, 51, 51, 0.12);
+  border-radius: 22px;
+  background: #fff;
+}
+
+.guest-qr-canvas {
+  display: block;
+  width: 204px !important;
+  height: 204px !important;
+}
+
+.qr-render-error {
+  display: grid;
+  place-items: center;
+  min-height: 180px;
+  padding: 14px;
+  color: #92400e;
+  text-align: center;
+  font-size: 0.86rem;
+  font-weight: 850;
+}
+
+.pass-details {
+  display: grid;
+  gap: 5px;
+  color: var(--gaiah-medium);
+  font-weight: 800;
+}
+
+.pass-details strong {
+  color: var(--gaiah-primary);
+  font-size: 1.1rem;
+}
+
+.pass-actions {
+  grid-template-columns: 1fr;
+}
+
+.declined-card .invite-primary-button,
+.not-found-card .invite-secondary-button {
+  width: 100%;
+  margin-top: 16px;
+}
+
+.invite-alert {
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  border: 1px solid rgba(58, 122, 122, 0.18);
+  border-radius: 16px;
+  background: rgba(58, 122, 122, 0.1);
+  color: var(--gaiah-primary);
+  font-weight: 850;
+}
+
+.loading-card {
+  color: var(--gaiah-medium);
+  font-weight: 850;
+  text-align: center;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.unavailable-card {
+  margin-top: 18vh;
+  text-align: center;
+}
+
+@media (max-width: 560px) {
+  .public-invite-shell {
+    padding: 12px;
+  }
+
+  .invite-card {
+    padding: 15px;
+    border-radius: 18px;
+  }
+
+  .invitation-card-face {
+    padding: 12px;
+  }
+
+  .invite-media {
+    margin-inline: -10px;
+    border-radius: 10px;
+  }
+
+  .invite-actions {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .real-qr-frame {
+    width: 210px;
+    height: 210px;
+    max-width: 78vw;
+    max-height: 78vw;
+  }
+
+  .guest-qr-canvas {
+    width: 190px !important;
+    height: 190px !important;
+  }
+}

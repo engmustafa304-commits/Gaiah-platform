@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>دعوة مناسبة | جيّة</title>
+    <link rel="stylesheet" href="/shared/gaiah-ui.css" />
+    <link rel="stylesheet" href="./invite.css" />
+  </head>
+  <body>
+    <main id="publicInviteApp" class="public-invite-shell">
+      <header class="invite-header">
+        <a class="invite-brand" href="/">جيّة</a>
+        <span>دعوة مناسبة</span>
+      </header>
+
+      <section id="inviteState" class="invite-state"></section>
+      <section id="inviteContent" class="invite-content"></section>
+    </main>
+
+    <script src="/vendor/qrcode.min.js"></script>
+    <script type="module" src="./invite.js"></script>
+  </body>
+</html>
